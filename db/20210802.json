@@ -1,0 +1,44 @@
+{
+  "tradingday" : {
+    "date" : 20210802,
+    "strategies" : [
+      {
+        "m-NDX-SPX" : {
+          "market" : "QQQ",
+          "sentiment" : "bearish",
+          "gain" : -0.5,
+          "days" : 20,
+          "entrydate" : 20210703,
+          "components" : [
+            {
+              "component" : "c-QQQ-S3",
+              "entrydate" : 20210813
+            },
+            {
+              "component" : "c-QQQ-S4b",
+              "entrydate" : 20210803
+            }
+          ]
+        }
+      },
+      {
+        "m-SPXo-VIXY" : {
+          "market" : "VIXY",
+          "sentiment" : "Bullish",
+          "gain" : 3.4,
+          "days" : 5,
+          "entrydate" : 20210712,
+          "components" : [
+            {
+              "component" : "c-VIXY-L2a",
+              "entrydate" : 20210712
+            }
+          ]
+        }
+      }
+    ],
+    "components" : [
+
+    ]
+  }
+}
