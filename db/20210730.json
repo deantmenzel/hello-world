@@ -1,12 +1,12 @@
 {
-  "date" : 20210802,
+  "date" : 20210730,
   "strategies" : [
     {
       "m-NDX-SPX" : {
         "market" : "QQQ",
         "sentiment" : "bearish",
-        "gain" : -0.5,
-        "days" : 20,
+        "gain" : 1.5,
+        "days" : 19,
         "entrydate" : 20210703,
         "components" : [
           {
@@ -24,8 +24,8 @@
       "m-SPXo-VIXY" : {
         "market" : "VIXY",
         "sentiment" : "Bullish",
-        "gain" : 3.4,
-        "days" : 5,
+        "gain" : -0.2,
+        "days" : 4,
         "entrydate" : 20210712,
         "components" : [
           {
