@@ -1,4 +1,3 @@
-# hello-world
-Just another first-time repo
+# hello-world gh-pages
 
-Adding another paragraph to get used to the branch and commit processes.
+This is the readme.md for the gh pages website
