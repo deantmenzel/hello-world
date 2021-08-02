@@ -36,6 +36,7 @@ var buildDB = (jsondata) => {
 var addTradingDay = (jsondata) => {
   ais.push(jsondata)
   // The first json file loaded is the current day so its OK to process it at this point
+  console.log(ais.length);
   ais.length == 1 && render()
 }
 
