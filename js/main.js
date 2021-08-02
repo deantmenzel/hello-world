@@ -1,4 +1,4 @@
-const ais = new Object();
+const ais = new Array();
 
 document.addEventListener('readystatechange', (event) => {
   console.log(`ReadyState: ${document.readyState}`);
@@ -21,7 +21,8 @@ var fetchdata = (url, action) => {
       action(JSON.parse(xhr.responseText));
     }
   };
-  xhr.open('GET', url);
+  // Append data in query string to 'disable' caching
+  xhr.open('GET', url + "?" + (new Date()).getTime());
   xhr.send();
 }
 
@@ -33,6 +34,17 @@ var buildDB = (jsondata) => {
 }
 
 var addTradingDay = (jsondata) => {
-  ais[jsondata["date"]]["strategies"] = jsondata["strategies"]; 
-  ais[jsondata["date"]]["components"] = jsondata["components"]; 
+  ais.push(jsondata)
+  // The first json file loaded is the current day so its OK to process it at this point
+  ais.length == 1 && render()
+}
+
+var render = () => {
+  let today = ais[0]; 
+  var templates = document.querySelectorAll("template")
+  var titleclone = templates[0].content.cloneNode(true);
+  titleclone.querySelectorAll("time")[0].textContent = ais[0].date;
+  document.body.appendChild(titleclone);
+  //var stratclone = templates[1].content.cloneNode(true);
+  //stratclone.querySelectorAll("dd")[0].textConent = ais[0].strategies
 }
