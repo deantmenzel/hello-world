@@ -45,6 +45,7 @@ var render = () => {
   var titleclone = templates[0].content.cloneNode(true);
   titleclone.querySelectorAll("time")[0].textContent = ais[0].date;
   document.body.appendChild(titleclone);
-  //var stratclone = templates[1].content.cloneNode(true);
-  //stratclone.querySelectorAll("dd")[0].textConent = ais[0].strategies
+  var stratclone = templates[1].content.cloneNode(true);
+  stratclone.querySelectorAll("dd")[0].textContent = ais[0].strategies[0].name
+  document.body.appendChild(stratclone);
 }
