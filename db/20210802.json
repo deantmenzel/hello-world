@@ -2,39 +2,206 @@
   "date" : 20210802,
   "strategies" : [
     {
-      "name" : "m-NDX-SPX",
-      "market" : "QQQ",
-      "sentiment" : "bearish",
-      "gain" : -0.5,
-      "days" : 20,
-      "entrydate" : 20210703,
-      "components" : [
-        {
-          "component" : "c-QQQ-S3",
-          "entrydate" : 20210813
-        },
-        {
-          "component" : "c-QQQ-S4b",
-          "entrydate" : 20210803
-        }
-      ]
+      "id" : "[LIVE] m-SPX-RUT",
+      "action" : "idle"
     },
     {
-      "name" : "m-SPXo-VIXY",
-      "market" : "VIXY",
-      "sentiment" : "Bullish",
-      "gain" : 3.4,
-      "days" : 5,
-      "entrydate" : 20210712,
-      "components" : [
-        {
-          "component" : "c-VIXY-L2a",
-          "entrydate" : 20210712
-        }
-      ]
+      "id" : "[LIVE] m-NDX-SPX",
+      "action" : "switch",
+      "position1" : {
+        "action" : "exit",
+        "component" : "c-SPY-L2d",
+        "gain" : -0.5,
+        "days" : 20,
+        "entryDate" : 20210703,
+        "executionDate" : 20210803,
+        "instruments" : [
+          {
+            "type" : "ETF",
+            "inverse" : "No",
+            "gearing" : 2,
+            "symbol" : "GGUS",
+            "exchange" : "ASX",
+            "executionReferencePrice": 0.00
+          },
+          {
+            "type" : "ETF",
+            "inverse" : "No",
+            "gearing" : 1,
+            "symbol" : "SPY",
+            "exchange" : "ARCA",
+            "executionReferencePrice": 0.00
+          },
+          {
+            "type" : "ETF",
+            "inverse" : "No",
+            "gearing" : 2,
+            "symbol" : "SDS",
+            "exchange" : "ARCA",
+            "executionReferencePrice": 0.00
+          },
+          {
+            "type" : "ETF",
+            "inverse" : "No",
+            "gearing" : 3,
+            "symbol" : "UPRO",
+            "exchange" : "ARCA",
+            "executionReferencePrice": 0.00
+          },
+          {
+            "type" : "Option",
+            "inverse" : "No",
+            "gearing" : 5,
+            "symbol" : "SPY/17Z21C345",
+            "exchange" : "OPRA",
+            "executionReferencePrice": 0.00
+          }
+        ]
+      },
+      "position2" : {
+        "action" : "enter",
+        "component" : "c-SPY-S3g",
+        "executionDate" : 20210803,
+        "instruments" : [
+          {
+            "type" : "ETF",
+            "inverse" : "Yes",
+            "gearing" : 2,
+            "symbol" : "BBUS",
+            "exchange" : "ASX",
+            "executionReferencePrice": 0.00
+          },
+          {
+            "type" : "ETF",
+            "inverse" : "Yes",
+            "gearing" : 1,
+            "symbol" : "SH",
+            "exchange" : "ARCA",
+            "executionReferencePrice": 0.00
+          },
+          {
+            "type" : "ETF",
+            "inverse" : "Yes",
+            "gearing" : 2,
+            "symbol" : "SSO",
+            "exchange" : "ARCA",
+            "executionReferencePrice": 0.00
+          },
+          {
+            "type" : "ETF",
+            "inverse" : "Yes",
+            "gearing" : 3,
+            "symbol" : "SPXU",
+            "exchange" : "ARCA",
+            "executionReferencePrice": 0.00
+          },
+          {
+            "type" : "Option",
+            "inverse" : "Yes",
+            "gearing" : 5,
+            "symbol" : "SPY/19H22P360",
+            "exchange" : "OPRA",
+            "executionReferencePrice": 0.00
+          }
+        ]
+      }
+    },
+    {
+      "id" : "[LIVE] m-SPXo-VIXY",
+      "action" : "hold",
+      "position1" : {
+        "action" : "hold",
+        "component" : "c-VIXY-L2a",
+        "gain" : 3.4,
+        "days" : 5,
+        "entryDate" : 20210712
+      }
     }
   ],
   "components" : [
-
+    {
+      "id" : "c-SPY-L2d",
+      "gain" : 2.98,
+      "days" : 12,
+      "entryDate" : 20210714,
+      "executionDate" : 20120619,
+      "executionReferencePrice" : 342.01,
+      "executionReferencePriceLimit" : 343.56,
+      "executionLimit" : 1.29
+    },
+    {
+      "id" : "c-VIXY-L2a",
+      "gain" : 2.98,
+      "days" : 12,
+      "entryDate" : 20210707
+    },
+    {
+      "id" : "c-USO-S1a"
+    },
+    {
+      "id" : "c-SPY-S3g",
+      "executionDate" : 20120619,
+      "executionReferencePrice" : 342.01,
+      "executionReferencePriceLimit" : 343.56,
+      "executionLimit" : 1.29
+    }
+  ],
+  "strategy-component-maps" : [
+    {
+      "id" : "[Live] m-SPX",
+      "longid" : "m-SPY-S2-S3gcfdeabhi-L2-L3bcd",
+      "name" : "S&P500 Swing",
+      "components" : [
+        "c-SPY-S2",
+        "c-SPY-S3g",	
+        "c-SPY-S3c",	
+        "c-SPY-S3f",	
+        "c-SPY-S3d",	
+        "c-SPY-S3e",	
+        "c-SPY-S3a",	
+        "c-SPY-S3b",	
+        "c-SPY-S3h",	
+        "c-SPY-S3i",	
+        "c-SPY-L2",	
+        "c-SPY-L3b",	
+        "c-SPY-L3c",	
+        "c-SPY-L3d"
+      ]
+    },
+    {
+      "id" : "[Live] m-SPX-RUT",
+      "longid" : "m-SPY-S2-S3gcfdeabhi-L2-L3bcd > IWM",
+      "name" : "S&P500 Russell 2000 Swing",
+      "components" : [
+        "c-SPY-S2",
+        "c-SPY-S3g"
+      ]
+    }
+  ],
+  "market-data" : [ 
+    {
+      "market" : "QQQ",
+      "open" : 0.00,
+      "high" : 0.00,
+      "low" : 0.00,
+      "close" : 0.00,
+      "changeDay" : 0.00,
+      "changeWeek" : 0.00,
+      "changeMonth" : 0.00,
+      "changeQuarter" : 0.00,
+      "changeYear" : 0.00
+    },
+    {
+      "market" : "SPY",
+      "open" : 0.00,
+      "high" : 0.00,
+      "low" : 0.00,
+      "close" : 0.00,
+      "changeDay" : 0.00,
+      "changeWeek" : 0.00,
+      "changeMonth" : 0.00,
+      "changeQuarter" : 0.00,
+      "changeYear" : 0.00
+    }
   ]
 }

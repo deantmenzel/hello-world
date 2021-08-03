@@ -1,4 +1,4 @@
-const ais = new Array();
+const aiis = new Array();
 
 document.addEventListener('readystatechange', (event) => {
   console.log(`ReadyState: ${document.readyState}`);
@@ -13,12 +13,12 @@ window.addEventListener('load', (event) => {
   console.log(`WindowLoaded`);
 });
 
-var fetchdata = (url, action) => {
+var fetchdata = (url, action, param) => {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function () {
     if (xhr.readyState !== 4) return;
     if (xhr.status >= 200 && xhr.status < 300) {
-      action(JSON.parse(xhr.responseText));
+      action(JSON.parse(xhr.responseText), param);
     }
   };
   // Append data in query string to 'disable' caching
@@ -28,19 +28,22 @@ var fetchdata = (url, action) => {
 
 var buildDB = (jsondata) => {
   ais["tradingdays"] = jsondata["tradingdays"];
-  ais["tradingdays"].forEach((tradingday) => {
-    fetchdata(`https://deantmenzel.github.io/hello-world/db/${tradingday}.json`, addTradingDay)
+  ais["tradingdays"].forEach((tradingday, index) => {
+    fetchdata(`https://deantmenzel.github.io/hello-world/db/${tradingday}.json`, addTradingDay, index)
   })
 }
 
-var addTradingDay = (jsondata) => {
-  ais.push(jsondata)
-  // The first json file loaded is the current day so its OK to process it at this point
-  ais.length == 1 && render()
+var addTradingDay = (jsondata, param) => {
+  aiis.push(jsondata)
+  // If the first trading day from index.json (param = 0) then render, else do nothing
+  param == 0 && render(aiis[0])
 }
 
-var render = () => {
-  let today = ais[0]; 
+var render = (today) => {
+  today.strategies.forEach((strategy) => {
+    console.log(`${strategy.id} ${strategy.action}`)
+  })
+  /*
   var templates = document.querySelectorAll("template")
   var titleclone = templates[0].content.cloneNode(true);
   titleclone.querySelectorAll("time")[0].textContent = ais[0].date;
@@ -48,4 +51,5 @@ var render = () => {
   var stratclone = templates[1].content.cloneNode(true);
   stratclone.querySelectorAll("dd")[0].textContent = ais[0].strategies[0].name
   document.body.appendChild(stratclone);
+  */
 }
