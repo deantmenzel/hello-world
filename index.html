@@ -1,40 +1,47 @@
+<!DOCTYPE html>
 <html>
   <head>
     <script src="js/main.js" type="text/javascript"></script>
+    <style>
+      html {
+        --color: blue;
+      }
+      h1 {
+        color: var(--color);
+      }
+    </style>
   </head>
   <body>
 
-    <template>
-      <h1>Status on <time datetime=""></time></h1>
+    <h1>Trading day</h1>
+
+    <template id="template-trading-day">
+      <style>
+        h1 {
+          color: red;
+        }
+        ::slotted(time)::before {
+          content: attr(datetime);
+        }
+      </style>
+      <section>
+        <h1>Status on <slot name="tradingdate">today</slot></h1>
+        <slot name="strategystatuses"></slot>
+      </section>
     </template>
 
-    <template id="hold">
-      
+    <template id="template-strategy-summary">
+      <h2><slot name="strategy"></slot></h2>
+      <p><slot name="status"></slot></p>
     </template>
 
-    <template id="switch">
-      <h1>Strategy name</h1>
-      <dl>
-        <dt>Strategy ID</dt>
-        <dd data-prop="id"></dd>
-        <dt>Strategy Long ID</dt>
-        <dd></dd>
-        <dt>Component</dt>
-        <dd></dd>
-        <dt>Gain</dt>
-        <dd></dd>
-        <dt>Days</dt>
-        <dd></dd>
-        <dd>Entry date</dd>
-        <dt><time datetime=""></time></dt>
-        <dt>Action</dt>
-        <dd></dd>
-        <dt>Execution date</dt>
-        <dd><time datetime=""></time></dd>
-        <dt>Price</dt>
-        <dd></dd>
-      </dl>
-    </template>
+    <!--
+    <trading-day>
+      <time slot="tradingdate" datetime="Wednesday, 12 July 2021"></time>
+    </trading-day>
+    -->
+    
 
   </body>
+
 </html>
