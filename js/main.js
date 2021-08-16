@@ -2,9 +2,9 @@ const aiis = new Array();
 
 document.addEventListener('readystatechange', (event) => {
   // console.log(`ReadyState: ${document.readyState}`);
-  if(document.readyState === 'complete') {
-    defineCustomElements();
-  }
+  //if(document.readyState === 'complete') {
+  //  defineCustomElements();
+  //}
 });
 
 document.addEventListener('DOMContentLoaded', (event) => {
