@@ -30,7 +30,7 @@ let fetchdata = (url, action, param) => {
 }
 
 let buildDB = (jsondata) => {
-  aiis["index"] = jsondata["tradingdays"];
+  aiis["index"] = jsondata;
   aiis["tradingDays"] = new Array();
   aiis.index.forEach((tradingDay, index) => {
     // For the moment, only do the current trading day
