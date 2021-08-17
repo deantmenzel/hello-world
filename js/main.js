@@ -9,36 +9,14 @@ const _ = {
   
   loadtradingdayhistory: false,
 
-  documentreadystatechange: () => {
-    document.readyState === 'complete' && _.defineCustomElements();
-  },
+  userid: null,
 
-  /**
-   * Load both the index schema and metrics data files staight up. 
-   * Note that schema and metrics are cached because they are bigger files update very infrequently
-   */
-  domcontentloaded: () => {
-    _.fetchdata(`db/index.json`, null, false, _.buildDB)
-    //_.fetchdata(`db/schema.json`, null, true, (jsondata) => _.schema = jsondata)
-    _.fetchdata(`db/metrics.json`, null, true, (jsondata) => _.metrics = jsondata)
-  },
-
-  /**
-   * Add the data for each trading day to the tradingdaydata array.
-   * @param {json} jsondata - Strategy data for a specific day.
-   * @param {integer} tradingdayindex - The index of the trading day, 0 is current (latest) day.
-   */
-  addTradingDay: (jsondata, tradingdayindex) => {
-    _.tradingdaydata.push(jsondata)
-    render();
-  },
-  
   /**
    * Get trading day index into _ object to drive loading of current (latest) day and prior days. 
    * If _.loadtradinghistory is false, do not load prior days
    * @param {json} jsondata - Data parsed in the _.fetch function
    */
-  buildDB: (jsondata) => {
+   buildDB: (jsondata) => {
     _.tradingdayindex = jsondata;
     _.tradingdaydata = new Array();
     _.tradingdayindex.forEach((tradingDay, index) => {
@@ -48,6 +26,41 @@ const _ = {
     })
   },
 
+  buildPage: () => {
+
+  },
+
+  /**
+   * Setup user as soon as possible, and don't do anything else unless there is a valid user.
+   */
+  documentreadystatechange: () => {
+    document.readyState === 'interactive' && _.fetchdata(`db/user.json`, null, false, _.setupUser)
+    document.readyState === 'complete' && _.userid != null && _.defineCustomElements();
+  },
+
+  /**
+   * Load both the index schema and metrics data files staight up, if there is a valid user.
+   * Note that schema and metrics are cached because they are bigger files update very infrequently
+   */
+  domcontentloaded: () => {
+    if(_.userid != null) {
+      _.fetchdata(`db/index.json`, null, false, _.buildDB)
+      _.fetchdata(`db/schema.json`, null, true, (jsondata) => _.schema = jsondata)
+      _.fetchdata(`db/metrics.json`, null, true, (jsondata) => _.metrics = jsondata)
+    }
+  },
+
+  /**
+   * Add the data for each trading day to the tradingdaydata array. Being building page once the 
+   * current (latest) trading day data has been added.
+   * @param {json} jsondata - Strategy data for a specific day.
+   * @param {integer} tradingdayindex - The index of the trading day, 0 is current (latest) day.
+   */
+  addTradingDay: (jsondata, tradingdayindex) => {
+    _.tradingdaydata.push(jsondata)
+    tradingdayindex === 0 && _.buildPage();
+  },
+  
   /**
    * Generate a single HTML element to fill the specified slot of a template.
    * @param {string} slotName - Name of slot.
@@ -119,6 +132,10 @@ const _ = {
     cache = (cache === false) ? `?${new Date().getTime()}` : ``;
     xhr.open('GET', `${url}${cache}`);
     xhr.send();
+  },
+
+  setupUser: () => {
+    console.log(location.search)
   },
 
   windowload: () => {},

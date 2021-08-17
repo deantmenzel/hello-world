@@ -11,37 +11,34 @@
       }
     </style>
   </head>
+
   <body>
-
-    <h1>Trading day</h1>
-
-    <template id="template-trading-day">
-      <style>
-        h1 {
-          color: red;
-        }
-        ::slotted(time)::before {
-          content: attr(datetime);
-        }
-      </style>
-      <section>
-        <h1>Status on <slot name="tradingdate">today</slot></h1>
-        <slot name="strategystatuses"></slot>
-      </section>
-    </template>
-
-    <template id="template-strategy-summary">
-      <h2><slot name="strategy"></slot></h2>
-      <p><slot name="status"></slot></p>
-    </template>
-
-    <!--
-    <trading-day>
-      <time slot="tradingdate" datetime="Wednesday, 12 July 2021"></time>
-    </trading-day>
-    -->
-    
-
+    <header></header>
+    <main>
+      <section></section>
+      <aside></aside>
+    </main>
+    <footer></footer>
   </body>
+
+  <template id="template-trading-day">
+    <style>
+      h1 {
+        color: red;
+      }
+      ::slotted(time)::before {
+        content: attr(datetime);
+      }
+    </style>
+    <section>
+      <h1>Status on <slot name="tradingdate">today</slot></h1>
+      <slot name="strategystatuses"></slot>
+    </section>
+  </template>
+
+  <template id="template-strategy-summary">
+    <h2><slot name="strategy"></slot></h2>
+    <p><slot name="status"></slot></p>
+  </template>
 
 </html>
