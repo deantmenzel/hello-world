@@ -1,82 +1,82 @@
-const aiis = new Array();
+const _ = {
 
-document.addEventListener('readystatechange', (event) => {
-  // console.log(`ReadyState: ${document.readyState}`);
-  //if(document.readyState === 'complete') {
-  //  defineCustomElements();
-  //}
-});
+  urlroot: 'https://deantmenzel.github.io/hello-world/',
+  customHTMLelements: [
+    'trading-day',
+    'strategy-summary'
+  ],
+  loadtradingdayhistory: false,
 
-document.addEventListener('DOMContentLoaded', (event) => {
-  // console.log(`DOMContentLoaded`);
-  fetchdata('https://deantmenzel.github.io/hello-world/db/index.json', buildDB);
-});
+  documentreadystatechange: () => {
+    document.readyState === 'complete' && _.defineCustomElements();
+  },
 
-window.addEventListener('load', (event) => {
-  //console.log(`WindowLoaded`);
-});
+  domcontentloaded: () => {
+    _.fetchdata(`db/index.json`, _.buildDB)
+  },
 
-let fetchdata = (url, action, param) => {
-  let xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState !== 4) return;
-    if (xhr.status >= 200 && xhr.status < 300) {
-      action(JSON.parse(xhr.responseText), param);
-    }
-  };
-  // Append data in query string to 'disable' caching
-  xhr.open('GET', url + "?" + (new Date()).getTime());
-  xhr.send();
-}
+  windowload: () => {},
 
-let buildDB = (jsondata) => {
-  aiis["index"] = jsondata;
-  aiis["tradingDays"] = new Array();
-  aiis.index.forEach((tradingDay, index) => {
-    // For the moment, only do the current trading day
-    index === 0 && fetchdata(`https://deantmenzel.github.io/hello-world/db/${tradingDay}.json`, addTradingDay, index)
-  })
-}
-
-var addTradingDay = (jsondata, param) => {
-  aiis.tradingDays.push(jsondata)
-  // If the first trading day from index.json (param = 0) then render, else do nothing
-  param === 0 && render()
-}
-
-/*
-var render = () => {
-  var today = aiis.tradingDays.filter(item => item.date == aiis.index[0])[0];
-  today.strategies.forEach((strategy) => {
-    if(strategy.position1) {
-      var test = today.components.filter(item => item.id === strategy.position1.component);
-      console.log(test);
-    }
-  })
-}
-*/
-
-let defineCustomElements = () => {
-  let customElementNames = ['trading-day','strategy-summary'];
-  customElementNames.forEach(element => defineCustomElement(element))
-}
-
-let defineCustomElement = (customElementName) => {
-  customElements.define(customElementName,
-    class extends HTMLElement {
-      static get observedAttributes() {}
-      constructor() {
-        super();
-        let template = document.getElementById(`template-${customElementName}`);
-        let newInstance = template.content.cloneNode(true);
-        const shadowRoot = this.attachShadow({mode: 'open'}).appendChild(newInstance);
+  /*
+   * Add the data for each trading day to the tradingdaydata array. Always render current day, but * only load previous day(s) if _.loadtradinghistory is true.
+   * @param json Trading day data
+   * @param integer The index of the trading day, 0 is current day 
+   */
+  addTradingDay: (jsondata, tradingdayindex) => {
+    _.tradingdaydata.push(jsondata)
+    // If the first trading day from index.json then render, else do nothing
+    tradingdayindex === 0 && render() || _.loadtradingdayhistory && render();
+  },
+  
+  buildDB: (jsondata) => {
+    _.tradingdayindex = jsondata;
+    _.tradingdaydata = new Array();
+    _.tradingdayindex.forEach((tradingDay, index) => {
+      // For the moment, only do the current trading day
+      _.fetchdata(`db/${tradingDay}.json`, _.addTradingDay, index)
+    })
+  },
+  
+  defineCustomElement: (customElementName) => {
+    customElements.define(customElementName,
+      class extends HTMLElement {
+        static get observedAttributes() {}
+        constructor() {
+          super();
+          let template = document.getElementById(`template-${customElementName}`);
+          let newInstance = template.content.cloneNode(true);
+          const shadowRoot = this.attachShadow({mode: 'open'}).appendChild(newInstance);
+        }
+        connectedCallback() {}
+        disconnectedCallback() {}
+        attributeChangedCallback(attrName, oldValue, newValue) {}
       }
-      connectedCallback() {}
-      disconnectedCallback() {}
-      attributeChangedCallback(attrName, oldValue, newValue) {}
-    }
-  )
+    )
+  },
+
+  defineCustomElements: () => {
+    _.customHTMLelements.forEach(element => _.defineCustomElement(element))
+  },
+
+  fetchdata: (url, action, param) => {
+    url = `${_.urlroot}${url}`;
+    let xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        action(JSON.parse(xhr.responseText), param);
+      }
+    };
+    // Append data in query string to 'disable' caching
+    xhr.open('GET', url + "?" + (new Date()).getTime());
+    xhr.send();
+  }
+
 };
+
+document.addEventListener('readystatechange', (event) => _.documentreadystatechange());
+document.addEventListener('DOMContentLoaded', (event) => _.domcontentloaded());
+window.addEventListener('load', (event) => _.windowload());
 
 let render = () => {
 
