@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/javascript">
+    let defineCustomElement = (customElementName) => {
+      customElements.define(customElementName, 
+        class extends HTMLElement {
+          constructor() { 
+            super();
+            let template = document.querySelector(`#${customElementName}`);
+            this.attachShadow({mode:'open'}).appendChild(template.content.cloneNode(true));
+          }
+          connectedCallback() {}
+          buildgrid(data, rowtemplateid) {
+            // Get top-level child that is NOT a style sheet. 
+            // There must be only one top-level child per template.
+            let rowtemplate = document.querySelector(`#${rowtemplateid}`).content
+              .querySelector(':not(style)')
+            data.forEach((row, rowindex) => {
+              let rowclone = rowtemplate.cloneNode(true);
+              let slots = rowclone.querySelectorAll('slot');
+              row.forEach((columnvalue, columnindex) => {
+                slots[columnindex].setAttribute(`name`, `${rowindex}.${columnindex}`);
+                this.insertAdjacentHTML('beforeend', 
+                  `<span slot="${rowindex}.${columnindex}">${columnvalue}</span>`
+                );
+              })
+              this.shadowRoot.querySelector(':not(style)').appendChild(rowclone);
+            })
+          }
+        }
+      )
+    }
+  </script>
+</head>
+<body>
+
+  <template id="market-status-table">
+    <table border="1" cellspacing="5" cellpadding="5">
+      <thead>
+        <th>A</th>
+        <th>B</th>
+        <th>C</th>
+      </thead>
+    </table>
+  </template>
+
+  <template id="market-status-row">
+    <tbody>
+      <tr>
+        <td><slot></slot></td>
+        <td><slot></slot></td>
+        <td><slot></slot></td>
+      </tr>
+    </tbody>
+  </template>
+
+  <template id="definition-list">
+    <style>
+      div {
+        align-items: center;
+        align-items: stretch;
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        margin: 0;
+        padding: 0;
+      }
+      dd, dt {
+        border: 1px solid hsl(0, 0%, 100%);
+        border-radius: 0.4rem;
+        background-color: hsl(78, 73%, 55%);
+        margin: auto 0;
+        padding: 0.4rem;
+      }
+      dt {
+        grid-column-start: 1;
+        grid-column-end: 2;
+      }
+      dd {
+        grid-column-start: 2;
+        grid-column-end: 3;
+      }
+    </style>
+    <dl></dl>
+  </template>
+
+  <template id="definition-list-entry">
+    <style>
+    </style>
+    <div>
+      <dt><slot></slot></dt>
+      <dd><slot></slot></dd>
+    </div>
+  </template>
+
+  <template id="definition-list2">
+    <dl>
+      <slot name="0"></slot>
+    </dl>
+  </template>
+
+  <template id="definition-list2-entry">
+    <slot name="0"></slot><slot name="1"></slot>
+  </template>
+
+  <script type="text/javascript">
+
+    let data = [
+      ['a', 'b', 'c'],
+      ['d', 'e', 'f'],
+      ['g', 'h', 'i']
+    ];
+    defineCustomElement('market-status-table');
+    document.body.appendChild(document.createElement('market-status-table'));
+    document.querySelector('market-status-table').buildgrid(data, 'market-status-row');
+
+    data = [
+      ['data term 1', 'data definition 1'],
+      ['data term 2', 'data definition 2'],
+      ['data term 3', 'data definition 3'],
+      ['data term 4', 'data definition 4'],
+      ['data term 5', 'data definition 5'],
+    ]
+    defineCustomElement('definition-list');
+    document.body.appendChild(document.createElement('definition-list'));
+    document.querySelector('definition-list').buildgrid(data, 'definition-list-entry');
+
+    defineCustomElement('definition-list2');
+    defineCustomElement('definition-list2-entry');
+
+  </script>
+
+  <definition-list2>
+    <div slot="0">
+      <definition-list2-entry>
+        <dt slot="0">dt 1</dt>
+        <dd slot="1">dd 1</dd>
+      </definition-list2-entry>
+    </div>
+    <div slot="0">
+      <definition-list2-entry>
+        <dt slot="0">dt 3</dt>
+        <dd slot="1">dd 4</dd>
+      </definition-list2-entry>
+    </div>
+  </definition-list2>
+
+</body>
+
+</html>
