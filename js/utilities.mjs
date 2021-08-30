@@ -49,8 +49,13 @@ class RemoteJSON {
   static retrieve (url, nocache) {
     nocache = (nocache === undefined) ? true : nocache;
     let querystring = (nocache) ? `?${new Date().getTime()}` : ``;
-    return fetch(`${url}${querystring}`)
-      .then(response => response.json())
+    return fetch(`${url}${querystring}`, {
+      method: 'GET',
+      headers : {
+        'Content-Type': 'application/json'
+      }
+    }
+    ).then(response => response.json())
   }
 
 }
