@@ -1,7 +1,9 @@
 const { User } = await import('./user.mjs');
-const user = await new User();
+// import { User } from './user.mjs';
+const user = new User();
 
 const { Render } = await import('./render.mjs');
+// import { Render } from './render.mjs';
 Render.initialise();
 
 if(await user.validate()) {
