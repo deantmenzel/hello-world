@@ -7,8 +7,8 @@ let { URLParameters, RemoteJSON, Storage } = await import('./utilities.mjs');
  
 class User {
   
-  _configsource = '../config.json';
-  _registrysource = `../db/users.json`;
+  _configsource = './config.json';
+  _registrysource = `./db/users.json`;
   _useridkey = `userid`;
   _strategyidkey = `strategyid`;
   _firstimekey = `firsttime`;
