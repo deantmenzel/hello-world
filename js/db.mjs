@@ -7,7 +7,7 @@ let { RemoteJSON, Convert } = await import('./utilities.mjs');
 
 class DB {
 
-  static _path = '../db/';
+  static _path = './db/';
   static _indexsource = `${this._path}index.json`;
   static _index = null;
   static _schemasource = `${this._path}schema.json`;
