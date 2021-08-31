@@ -178,18 +178,9 @@ class Render {
     return htmlelement;
   }
 
-  stylise() {
-    switch (this._componentname) {
-      case 'strategy-status':
-        // Specify at header level if strategy is in profit, so CSS can style child elements
-        if(this._component.querySelector('span[data-winning]'))
-          this._component.shadowRoot.querySelector('header').dataset.winning = true;
-        // Specify at header if strategy is idle, so CSS can style child element accoringly
-        if(this._component.querySelector('span[slot="1"]').innerText.includes('undefined')) {
-          this._component.shadowRoot.querySelector('header').dataset.idle = true;
-        }
-    }
-  }
+
+
+
 
   /**
    * Public method for rendering a component. It captures whether or not a fix is required for when 

@@ -3,12 +3,13 @@
  * application architecture model.
  */
 
-import { URLParameters, RemoteJSON, Storage } from './utilities.mjs';
+import { URLParameters, RemoteJSON, Storage } from './scratchutilities.mjs';
+// let { URLParameters, RemoteJSON, Storage } = await import('./scratchutilities.mjs');
 
 class User {
   
-  _configsource = './config.json';
-  _registrysource = `./db/users.json`;
+  _configsource = './scratchconfig.json';
+  _registrysource = `./db/scratchusers.json`;
   _useridkey = `userid`;
   _strategyidkey = `strategyid`;
   _firstimekey = `firsttime`;

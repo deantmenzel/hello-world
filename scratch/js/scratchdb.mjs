@@ -3,16 +3,17 @@
  * architecture model.
  */
 
-import { RemoteJSON, Convert } from './utilities.mjs';
+import { RemoteJSON, Convert } from './scratchutilities.mjs';
+// let { RemoteJSON, Convert } = await import('./utilities.mjs');
 
 class DB {
 
   static _path = './db/';
-  static _indexsource = `${this._path}index.json`;
+  static _indexsource = `${this._path}scratchindex.json`;
   static _index = null;
-  static _schemasource = `${this._path}schema.json`;
+  static _schemasource = `${this._path}scratchschema.json`;
   static _schema = null;
-  static _metricssource = `${this._path}metrics.json`
+  static _metricssource = `${this._path}scratchmetrics.json`
   static _metrics = null;
   static _tradinghistory = [];
   static _todayindex = null;
@@ -127,7 +128,7 @@ class DB {
         (this.newtrades) ? 'ACTION ALERT!' : 'No new trades today',
         (this.newtrades) ? 'There are new trades to execute on ' : 'There are no new trades for ',
         {
-          'value' : this.date,
+          'value' : '',
           'htmlelement': 'time',
           'attributes': `datetime=${this.date}`
         }
@@ -142,16 +143,18 @@ class DB {
      */
     this['_strategy-status'] = [];
     this.strategies.forEach((strategy) => {
-      let sign = (strategy[6][0][9] > 0 ) ? '+' : '';
+
+      // console.log(strategy)
+
       let parent = [
-        strategy[2], // strategy-name
+        strategy[2], 
         {
-            'value': `${sign}${strategy[6][0][9]}%`, 
-            'htmlelement': 'span',
-            'attributes': ((sign == '+') ? `data-winning=true` : ``)
+          'value': strategy[6][0][9], 
+          'htmlelement': 'span', 
+          'attributes' : `data-sign=${((strategy[6][0][9] > 0 ) ? '+' : '-')}`
         }, // position-gain
-        {'value': strategy[6][0][6], 'htmlelement': 'span'}, // position-duration
-        {'value': strategy[6][0][5], 'htmlelement': 'span'} // position-entry-date
+        {'value': strategy[6][0][6], 'htmlelement': 'span' }, // position-duration
+        {'value': strategy[6][0][5], 'htmlelement': 'span' } // position-entry-date
       ];
       this['_strategy-status'].push({
         'parent' : parent,

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script async src="js/app.js" type="module"></script>
+    <script async src="js/scratchapp.js" type="module"></script>
     <style>
       html {
         --border-radius: 8px;
@@ -47,8 +47,10 @@
     </style>
   </head>
 
+  <!--deans-2018-mac-mini.local:55044/scratch/scratch.html?userid=f3f13689fb47439fb5adca2b0ca9d4d1-->
+
   <body>
-    <header>deans-2018-mac-mini.local:55044/index.html?strategyid=m-USO&userid=f3f13689fb47439fb5adca2b0ca9d4d1</header>
+    <header>deans-2018-mac-mini.local:55044/scratch/scratch.html?userid=f3f13689fb47439fb5adca2b0ca9d4d1</header>
     <aside></aside>
     <main></main>
     <footer>footer</footer>
@@ -104,10 +106,8 @@
         display: table;
         grid-column-start: 1;
         grid-column-end: 2;
-        height: 100%;
         min-width: 12ch;
         text-align: center;
-        width: 100%;
       }
       dt ::slotted(:not(a)) {
         display: table-cell;
@@ -132,10 +132,9 @@
         margin: 1rem 0;
         padding: var(--padding);
       }
-      /* The following concept does not work in iOS */
-      /* ::slotted(time)::before {
+      ::slotted(time)::before {
         content: attr(datetime);
-      } */
+      }
     </style>
     <section>
       <nav>
@@ -256,29 +255,24 @@
 
   <template id="strategy-status">
     <style>
-      header {
-        align-items: center;
-        display: grid;
-        grid-template-columns: 15fr 5fr;
-      }
-      header h2 {
+      h2 {
         grid-column-start: 1;
         grid-column-end: 2;
         margin: 0;
         padding: 0 var(--padding);
       }
-      header li {
-        display: inline;
-        padding: 0;
-        list-style-type: none;
+      header {
+        align-items: center;
+        display: grid;
+        grid-template-columns: 7fr 3fr;
       }
-      header li:nth-of-type(1) {
-        display: block;
+      section {
+        border-radius: var(--border-radius);
+        background-color: var(--color-lightgrey);
+        margin: 0.5rem 0;
+        padding: var(--padding);
       }
-      header li span {
-        font-size: 0.75em;
-      }
-      header ul {
+      ul {
         border-radius: var(--border-radius);
         grid-column-start: 2;
         grid-column-end: 3;
@@ -286,18 +280,23 @@
         padding: var(--padding);
         text-align: right;
       }
-      header[data-winning] ul {
-        background-color:var(--color-blue);
+      li {
+        display: inline;
+        padding: 0;
+        list-style-type: none;
       }
-      header[data-idle] ul {
-        letter-spacing: -0.1rem;
-        visibility: hidden;
+      li:nth-of-type(1) {
+        display: block;
       }
-      section {
-        border-radius: var(--border-radius);
-        background-color: var(--color-lightgrey);
-        margin: 0.5rem 0;
-        padding: var(--padding);
+      ::slotted(span:nth-of-type(1)[data-sign="+"])::before {
+        content: '+';
+      }
+      ::slotted(span:nth-of-type(1))::after {
+        content: '%';
+      }
+      ::slotted(span:nth-of-type(2))::after {
+        content: ' days from';
+        font-size: 0.75em;
       }
       ::slotted(span:nth-of-type(3)) {
         white-space: nowrap;
@@ -308,7 +307,7 @@
         <h2><slot name="strategy-name"></slot></h2>
         <ul>
           <li><slot name="position-gain"></slot></li>
-          <li><slot name="position-duration"></slot><span> days from </span></li>
+          <li><slot name="position-duration"></slot></li>
           <li><slot name="position-entry-date"></slot></li>
         </ul>
       </header>
