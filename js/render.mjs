@@ -69,30 +69,39 @@ class Render {
 
   /**
    * Construct a component. Note that a component may be composed of multiple templates. If the 
-   * data object parameter s configured with 'parent' and 'child' properties for this component, 
-   * the constructor will automatically use a second template, named 'component-name-child' to 
-   * build this compound web component. If there is no 'parent' and 'child' properties in the data 
-   * object, then the default (simple) web component will be built.
+   * data object parameter s configured with 'parent' and 'children' properties for this component, 
+   * the constructor will automatically use multiple templates: 'component-name' (parent); 
+   * 'component-name-child-0' (first child); 'component-name-child-1' (second child); etc., to 
+   * build this compound web component. If there is no 'parent' and 'children' properties in the 
+   * data object, then the default (simple) web component will be built, which consists of one 
+   * template only.
    * COMPOUND COMPONENT conventions:
    *   component-name
    *   <template id="component-name">
-   *   <template id="component-name-child">
-   *   DB[component-name] // data for slots; must contain 'parent' and 'child' properties
-   *   User.config[component-name] // field names for slots; must contain parent, child props
-   *   Note that the child template is only used to create HTML fragment clones to be 
-   *   inserted into the parent template of the registered web component. 
+   *   <template id="component-name-child-1"> 
+   *   <template id="component-name-child-2"> 
+   *   <template id="component-name-child-x"> ...
+   *   DB[component-name] // data for slots; must contain 'parent' and 'children' properties where
+   *      parent is a single-dimension array of objects
+   *      children is a single-dimension array of two-dimensional arrays of objects
+   *   User.config[component-name] // field names for slots; must contain parent, children props
+   *   Note that children templates are only used to create HTML fragment clones to be 
+   *   inserted into the parent template of the registered web component. Children templates are 
+   *   not reigstered as web components and do not have shadowRoot DOMs.
+   *   All slots are child elements of the parent. There are no slots for child templates.
    * DEFAULT COMPONENT conventions:
    *   component-name
    *   <template id="component-name">
    *   (optional) DB[component-name] // data for slots 
    *   (optional) User.config[component-name] // field names for slots
    *   Data and field names are in arrays that correspond exactly with each other, and they must 
-   *   NOT contain 'parent' and 'child' properties.
+   *   NOT contain 'parent' and 'children' properties.
    * If no field names are provided, slots are named and referenced using the index of the data 
    * array. E.g. if a data array has 3 values, the value will go into slot 0, the second value will 
    * go into slot 1, the third into slot 2, etc.
    * @param componentname {string} Name of composite component. A component may be composed of a 
-   * 'header' and 'body' web component, where each is prefixed by the component name.
+   * its own template and multiple 'child' templates, where each child template is prefixed by the 
+   * component name. 
    * @param destination {HTMLElement} The HTML document element that the component is to be 
    * appended to.
    * @param data {object} The data array(s) for the trading day.
@@ -103,7 +112,7 @@ class Render {
     this._component = document.createElement(componentname);
     this._fields = fieldnames && fieldnames.config[componentname];
     this._data = (data && data[componentname]) || data;
-    if(this._data && this._data.parent !== undefined && this._data.child !== undefined) {
+    if(this._data && this._data.parent !== undefined && this._data.children !== undefined) {
       destination.appendChild(this._component);
       this._buildGrid();
     } else {
@@ -127,7 +136,7 @@ class Render {
    * be done with native web component functionality alone because we don't know how many rows the 
    * table has and how many cells in each table. This function handles all of that.
    * Note the [data-parent] and [data-child] attribute which specifies the top-level node in the 
-   *  cloned header and body templates to which child nodes are appended. 
+   * cloned header and body templates to which child nodes are appended. 
    */
   _buildGrid() {
     let parentslots = this._component.shadowRoot.querySelectorAll('slot');
@@ -136,17 +145,21 @@ class Render {
       parentslots[index].setAttribute('name', fieldname);
       this._component.appendChild(this._addSlot(fieldname, value));
     })
-    let childtemplate = document.querySelector(`#${this._componentname}-child`);
-    this._data.child.forEach((set, setindex) => {
-      let childclone = childtemplate.content.querySelector('[data-child]').cloneNode(true);
-      let slots = childclone.querySelectorAll('slot');
-      set.forEach((value, index) => {
-        let fieldname = 
-          (this._fields && this._fields.child[setindex][index]) || `${setindex}-${index}`;
-        slots[index].setAttribute(`name`, fieldname);
-        this._component.appendChild(this._addSlot(fieldname, value));
+    this._data.children.forEach((child, index) => {
+      let childname = `child-${index}`;
+      let childtemplate = document.querySelector(`#${this._componentname}-${childname}`);
+      child.forEach((set, setindex) => {
+        let childclone = childtemplate.content.querySelector(`[data-${childname}]`).cloneNode(true);
+        let slots = childclone.querySelectorAll('slot');
+        set.forEach((value, index) => {
+          let fieldname = 
+            (this._fields && this._fields.child[setindex][index]) || `${setindex}-${index}`;
+          slots[index].setAttribute(`name`, fieldname);
+          this._component.appendChild(this._addSlot(fieldname, value));
+        })
+        this._component.shadowRoot.querySelector(`[data-parent-of="${childname}"]`)
+          .appendChild(childclone);
       })
-      this._component.shadowRoot.querySelector('[data-parent]').appendChild(childclone);
     })
   }
 

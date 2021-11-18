@@ -87,7 +87,7 @@ class DB {
         'htmlelement': 'time',
         'attributes': `datetime=${this.date}`
       }],
-      'child' : data[3].filter((market) => marketsymbols.includes(market[1]))
+      'children' : [data[3].filter((market) => marketsymbols.includes(market[1]))]
     };
     // Uncomment the following lines to give proper names to fields from the databse schema. This 
     // is not actually not required for proper functioning of site but may be useful for debugging.
@@ -95,10 +95,10 @@ class DB {
     // schemalabel = schema[0].slice(0,1)[0];
     // config[schemalabel] = {
     //   'parent' : ['date'],
-    //   'child' : []
+    //   'children' : []
     // };
-    this[`_${schemalabel}`].child.forEach((market) => {
-      // config[schemalabel].child.push(
+    this[`_${schemalabel}`].children[0].forEach((market) => {
+      // config[schemalabel].children[0].push(
       //   schema[0].slice(1).map((item) => `${market[1]}${item.replace(schemalabel, '')}`)
       // )
       market.shift();
@@ -132,7 +132,7 @@ class DB {
           'attributes': `datetime=${this.date}`
         }
       ],
-      'child' : childdata
+      'children' : [childdata]
     }
 
     /**
@@ -155,7 +155,7 @@ class DB {
       ];
       this['_strategy-status'].push({
         'parent' : parent,
-        'child' : []
+        'children' : []
       })
     });
 

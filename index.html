@@ -139,7 +139,7 @@
     </style>
     <section>
       <nav>
-        <dl data-parent>
+        <dl data-parent-of="child-0">
           <div>
             <dt>
               <slot name="0">No new trades</slot>
@@ -156,8 +156,8 @@
     </section>
   </template>
 
-  <template id="strategy-alert-child">
-    <div data-child>
+  <template id="strategy-alert-child-0">
+    <div data-child-0>
       <dt>
         <slot name="0"></slot>
       </dt>
@@ -200,7 +200,7 @@
       }
     </style>
     <section>
-      <table data-parent>
+      <table data-parent-of="child-0">
         <caption><h2>Status of markets on <slot name="market-status-date"></slot></h2></caption>
         <thead>
           <tr>
@@ -223,8 +223,8 @@
     </section>
   </template>
 
-  <template id="market-status-child">
-    <tbody data-child>
+  <template id="market-status-child-0">
+    <tbody data-child-0>
       <tr>
         <td><slot name="market-status-symbol"></slot></td>
         <td><slot name="market-status-exchange"></slot></td>
@@ -312,13 +312,13 @@
           <li><slot name="position-entry-date"></slot></li>
         </ul>
       </header>
-      <table data-parent>
+      <table data-parent-of="child-0">
       </table>
     </section>
   </template>
 
-  <template id="strategy-status-child">
-    <tbody data-child>
+  <template id="strategy-status-child-0">
+    <tbody data-child-0>
     </tbody>
   </template>
 

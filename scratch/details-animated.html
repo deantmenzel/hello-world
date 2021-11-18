@@ -1,0 +1,444 @@
+<html>
+  <head>
+    <!-- To animate further with javascript, see 
+      https://css-tricks.com/how-to-animate-the-details-element-using-waapi/
+      Can't be done with pure CSS
+    -->
+    <style>
+      html {
+        --alt-row-color: hsl(0, 0%, 100%);
+        --border-radius: 8px;
+        --border-width: 2px;
+        --icon-au: url("../img/AUicon27x27.png");
+        --icon-us: url("../img/USicon27x27.png");
+        --line-height: 1.3;
+        --padding: 8px;
+        --position-exit-color: hsl(35, 100%, 50%);
+        --position-enter-color: hsl(135, 59%, 49%);
+        --position-color-back: hsl(240, 24%, 96%);
+        --table-rows: 5;
+        box-sizing: border-box;
+        font-family: 'Segoe UI','Lucida Grande',Tahoma,Arial,sans-serif;
+        line-height: var(--line-height);
+      }
+      main details {
+        background-color: var(--position-color-back);
+        margin: var(--padding) 0;
+        padding: 0;
+      }
+      main details[data-exit] > div > div, 
+      main details[data-exit] > summary {
+        border-color: var(--position-exit-color);
+      }
+      main details[data-exit] h3, 
+      main details[data-exit] td:nth-child(3) span {
+        background-color: var(--position-exit-color);
+      }
+      main details[data-enter] > div > div, 
+      main details[data-enter] > summary {
+        border-color: var(--position-enter-color);
+      }
+      main details[data-enter] h3, 
+      main details[data-enter] td:nth-child(3) span {
+        background-color: var(--position-enter-color);
+      }
+      main details > div {
+        overflow: hidden;
+      }
+      main details > div > div {
+        padding: var(--padding);
+      }
+      main details[open] > div > div {
+        animation-duration: var(--anitrans-duration);
+        animation-fill-mode: forwards;
+        animation-name: rollout;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+        border-style: solid;
+        border-width: var(--border-width);
+        border-top: none;
+      }
+      @keyframes rollout {
+        from { margin-top: calc(var(--table-rows) * -1rem) }
+        to { margin-top: 0 }
+      }
+      main details[open] h3::before {
+        transform: rotate(90deg);
+        /* content: '\25BD'; */
+      }
+      main details[open] summary {
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        border-bottom: none;
+      }
+      main details[open] h3 {
+        border-bottom-right-radius: var(--border-radius);
+      }
+      main h3 {
+        display: inline-table;
+        padding: var(--padding);
+        grid-column: 1 / 2;
+        margin: 0;
+      }
+      main h3::before {
+        transform: rotate(0);
+        transition: var(--anitrans-duration) transform ease-out;
+        content: '\25B7';
+        display: table-cell;
+        font-size: 2rem;
+        vertical-align: middle;
+      }
+      main h3 time {
+        display: block;
+      }
+      main h3 > span {
+        display: table-cell;
+        padding: 0 0 0 calc(var(--padding) / 2);
+        vertical-align: middle;
+      }
+      /* main summary > * {
+        display: inline;
+      } */
+      main summary > span {
+        grid-column: 2 / 3;
+      }
+      main summary {
+        align-items: center;
+        border-radius: var(--border-radius);
+        border-style: solid;
+        border-width: var(--border-width);
+        cursor: pointer;
+        display: grid;
+        grid-template-columns: auto 4fr;
+        grid-gap: 0.5rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      main summary::marker {
+        display: none;
+      }
+      main time::after {
+        content: attr(datetime);
+        white-space: nowrap;
+      }
+      main table {
+        border-radius: var(--border-radius);
+        border-collapse: collapse;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+      }
+      main table tr {
+        border-width: calc(var(--padding) / 2) 0;
+        border-style: solid;
+        border-color: transparent;
+      }
+      main table tr:nth-child(odd) {
+        background-color: var(--alt-row-color);
+      }
+      main table td {
+        background-position-y: center;
+        background-repeat: no-repeat;
+        white-space: nowrap;
+      }
+      main td[data-au] {
+        background-image: var(--icon-au);
+        min-width: 27px;
+        max-width: 27px;
+        padding: 0px;
+      }
+      main td[data-us] {
+        background-image: var(--icon-us);
+        min-width: 27px;
+        max-width: 27px;
+        padding: 0px;
+      }
+      main td:first-child {
+        padding: calc(var(--padding) / 2);
+        text-align: right;
+        white-space: nowrap;
+      }
+      main td:nth-child(3) span {
+        border-radius: var(--border-radius);
+        display: block;
+        padding: calc(var(--padding) / 1.5) var(--padding);
+
+      }
+      main td:last-child {
+        font-size: 0.75em;
+        padding: calc(var(--padding) / 2);
+        width: 50%;
+      }
+      main details summary::-webkit-details-marker,
+      main details summary::marker {
+        display: none;
+        content: "";
+      }
+    </style>
+  </head>
+  <body>
+
+    <main>
+      <details data-exit>
+        <summary>
+          <h3>
+            <span>
+              <span>EXIT</span>
+              <time datetime="Mon, 12-Jul-2021"></time>
+            </span>
+          </h3>
+          <span>
+            <span>EXIT the current bearish position on S&P500 Index, at market price, on </span>
+            <time datetime="Mon, 12-Jul-2021"></time>
+          </span>
+        </summary>
+        <div>  
+          <div>
+            <table>
+              <tbody>
+                <tr>
+                  <td>-2x ETF</td>
+                  <td data-au></td>
+                  <td><span>SELL BBUS @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+                <tr>
+                  <td>-1x ETF</td>
+                  <td data-us></td></td>
+                  <td><span>SELL SH @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+                <tr>
+                  <td>-2x ETF</td>
+                  <td data-us></td>
+                  <td><span>SELL SDS @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+                <tr>
+                  <td>-3x ETF</td>
+                  <td data-us></td>
+                  <td><span>SELL SPXU @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+                <tr>
+                  <td>Put Option</td>
+                  <td data-us></td>
+                  <td><span>SELL SPY/17Z21P348 @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </main>
+
+    <style>
+      aside details[data-exit] > div > div, 
+      aside details[data-exit] > summary {
+        border-color: var(--position-exit-color);
+      }
+      aside details[data-exit] > summary > span:first-child, 
+      aside details[data-exit] td:nth-child(3) span {
+        background-color: var(--position-exit-color);
+      }
+      aside details[data-enter] > div > div, 
+      aside details[data-enter] > summary {
+        border-color: var(--position-enter-color);
+      }
+      aside details[data-enter] > summary > span:first-child, 
+      aside details[data-enter] td:nth-child(3) span {
+        background-color: var(--position-enter-color);
+      }
+      aside details {
+        --anitrans-duration: 1000ms;
+        /* --details-height: 130px; */
+        background-color: var(--position-color-back);
+        margin: var(--padding) 0;
+        padding: 0;
+      }
+      aside summary {
+        display: table;
+        border-radius: var(--border-radius);
+        border-style: solid; 
+        border-width: var(--border-width);
+        margin: 0;
+        padding: 0;
+        width: calc(100% - var(--border-width) * 2);
+      }
+      aside summary::-webkit-details-marker,
+      aside summary::marker {
+        display: none;
+        content: "";
+      }
+      aside summary > span {
+        display: table-cell;
+        padding: calc(var(--padding) / 2) 0;
+        vertical-align: middle;
+      }
+      aside summary > span:first-child {
+        min-width: 23ch;
+      }
+      aside summary > span:last-child {
+        padding: 0 var(--padding);
+      }
+      aside summary > span > h3 {
+        display: table;
+        margin: 0;
+        padding: 0 var(--padding) 0 0;
+      }
+      aside summary > span > h3::before {
+        transition: var(--anitrans-duration) transform ease-out;
+        content: '\25B7';
+        display: table-cell;
+        font-size: 2rem;
+        padding: var(--padding);
+        vertical-align: middle;
+      }
+      aside summary > span > h3 > span {
+        display: table-cell;
+        vertical-align: middle;
+      }
+      aside summary h3 > span > span {
+        display: block;
+      }
+      aside time::after {
+        content: attr(datetime);
+        white-space: nowrap;
+      }
+      aside summary:focus {
+        outline: none;
+      }
+      aside details > div {
+        margin: 0;
+        padding: 0;
+        overflow-y: hidden;
+      }
+      aside details > div > div {
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+        border-style: solid;
+        border-width: var(--border-width);
+        border-top: none;
+        padding: var(--padding);
+      }
+      aside details[open] > summary {
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        border-bottom: none;
+      }
+      aside details[open] > summary > span {
+        border-bottom-right-radius: var(--border-radius);
+      }
+      aside details[transition="opening"] h3::before {
+        transform: rotate(90deg);
+      }
+      aside details[transition="closing"] h3::before {
+        transform: rotate(0deg);
+      }
+      aside details[transition="opening"] > div > div {
+        animation-duration: var(--anitrans-duration);
+        animation-name: rollout;
+      }
+      aside details[transition="closing"] > div > div {
+        animation-duration: var(--anitrans-duration);
+        animation-name: rollback;
+      }
+      @keyframes rollout {
+        /* from { margin-top: calc(var(--table-rows) * var(--line-height) * -1.5rem) } */
+        from { margin-top: calc(var(--details-height) * -1 + var(--border-width)) }
+        to { margin-top: 0 }
+      }
+      @keyframes rollback {
+        from { margin-top: 0 }
+        /* to { margin-top:  calc(var(--table-rows) * var(--line-height) * -1.5rem) } */
+        to { margin-top: calc(var(--details-height) * -1 + var(--border-width))  }
+      }
+    </style>
+
+    <aside>
+      <details data-exit>
+        <summary>
+          <span>
+            <h3>
+              <span>
+                <span>EXIT</span>
+                <time datetime="Mon, 12-Jul-2021"></time>
+              </span>
+            </h3>
+          </span>
+          <span>
+            <span>ENTER the current bearish position on S&P500 Index, at market price, on </span>
+            <time datetime="Mon, 12-Jul-2021"></time>
+          </span>
+        </summary>
+        <div>
+          <div>
+            <table>
+              <tbody>
+                <tr>
+                  <td>-2x ETF</td>
+                  <td data-au></td>
+                  <td><span>SELL BBUS @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+                <tr>
+                  <td>-1x ETF</td>
+                  <td data-us></td></td>
+                  <td><span>SELL SH @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+                <tr>
+                  <td>-2x ETF</td>
+                  <td data-us></td>
+                  <td><span>SELL SDS @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+                <tr>
+                  <td>-3x ETF</td>
+                  <td data-us></td>
+                  <td><span>SELL SPXU @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+                <tr>
+                  <td>Put Option</td>
+                  <td data-us></td>
+                  <td><span>SELL SPY/17Z21P348 @ 43.89</span></td>
+                  <td>limit +1.70% on last 43.89</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </aside>
+
+    <script>
+      document.querySelector('aside details').style.setProperty(
+        '--details-height', 
+        getComputedStyle(document.querySelector('aside details').querySelector('div')).height
+      );
+      document.querySelector('aside details').addEventListener('toggle', (event) => {
+        const details = event.srcElement;
+        const open = (details.getAttribute('open') == '') ? true : false;
+        const transition = details.getAttribute('transition');
+        open && details.style.setProperty(
+          '--details-height', 
+          getComputedStyle(details.querySelector('div')).height
+        )
+        open && !transition && details.setAttribute('transition', 'opening');
+        if(!open && transition) {
+          details.setAttribute('open', '')
+          details.setAttribute('transition', 'closing');
+          const delay = getComputedStyle(details).getPropertyValue('--anitrans-duration');        
+          setTimeout(() => {
+            const details = document.querySelector('aside details');
+            details.removeAttribute('transition');
+            details.removeAttribute('open');
+          }, parseInt(delay));
+        }
+      })      
+    </script>
+
+    <style>
+    </style>
+
+  </body>
+</html>

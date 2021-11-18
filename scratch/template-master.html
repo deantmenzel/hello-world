@@ -1,0 +1,3899 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--The purpose of this template is to determine HTML semantic structure and detailed styling for both the page and the web components within it. From this individual web components can be created.-->
+
+<head>
+
+  <title>Master HTML semantic template</title>
+  <link rel="icon" type="image/x-icon" href="../favicon.ico"><!--https://www.freefavicon.com/freefavicons/objects/iconinfo/artificial-intelligence-152-278132.html-->
+  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="initial-scale=1.0">
+
+  <style> /* Styling reset */
+    /** 
+     * Styling reset: minimum styling for readability of pure semantic HTML with no other styling 
+     * applied. This reset is not generic, it is specific to the layout of this site (for example, 
+     * nested <details> elements). Also note that this styling is not designed to be responsive.
+     * BUG FIXES (f***ing Safari):  
+     * 1. -webkit-marquee-increment: 0vw; for Safari and responsive typography based on vw units.
+     * 2. -webkit-text-size-adjust: none; for iOS Safari which buggers up text sizes with a change *    in portrait to landscpe orientation.
+     */
+    *, ::before, ::after {
+      box-sizing: border-box;
+      -webkit-text-size-adjust: none;
+      -webkit-marquee-increment: 0vw;
+      text-size-adjust: none;
+    }
+    body, img, svg, ul {
+      border: 0;
+      margin: 0;
+    }
+    body, img, svg {
+      padding: 0;
+    }
+    summary {
+      cursor: pointer;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 0.25em; padding-block: 0.25em; padding-inline: 0.25em;
+      text-align: center;
+    }
+  </style>
+  
+  <style> /** Global styling **********************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA
+    * 1. [data-settings-strategy-types] Strategy type visibility. List: 'simple', 'compound' 
+    * 2. [data-settings-markets] Market visibility. List: 'AU', 'US'
+    * 3. [data-settings-user-info] User info icon visibility. Boolean: 'true' or empty. 
+    * 4. [data-settings-price-action] Daily price action visibility. Boolean: 'true' or empty. 
+    * 5. [data-settings-component-map] Component map visibility. Boolean: 'true' or empty. 
+    * DESCENDANT COMPONENTS
+    *    <x-page-header>
+    *    <x-user-menu>
+    *    <x-user-info>
+    *    <x-trade-alert>
+    *    <x-strategy-status>
+    *    <x-position-status>
+    *    <x-instrument-status>
+    *    <x-component-status>
+    *    <x-market-status>
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) body[data-settings-strategy-types]
+    *    b) body[data-settings-markets]
+    *    c) body[data-settings-user-info]
+    *    d) body[data-settings-price-action]
+    *    e) body[data-settings-component-maps]
+    *    f) body:target... body id="help": #help in browser address bar will show all <x-user-info> 
+    *       html doc fragments at once. See <x-user-info> component for further details.
+    * 2. Underlying UI Structure
+    * 3. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    body {
+      --data-settings-user-info-display: none;
+      --data-settings-price-action-display: none;
+      --data-settings-component-map-display: none;
+    }
+    body[data-settings-markets] {
+      --data-settings-markets-display: none;
+    }
+    body[data-settings-strategy-types] {
+      --data-settings-strategy-types-display: none;
+    }
+    body[data-settings-user-info="true"] {
+      --data-settings-user-info-display: inline-block;
+    }
+    body[data-settings-price-action="true"] {
+      --data-settings-price-action-display: block;
+    }
+    body[data-settings-component-maps="true"] {
+      --data-settings-component-map-display: block;
+    }
+    body:target {
+      --user-info-full-help-display: flex;
+    }
+   /***** Underlying UI Structure ****************************************************************/
+    :root {
+      --border-radius: 0.5rem;
+      --border-width: 2px;
+      --color-blue: hsl(211, 100%, 50%);
+      --color-blue-hsl: 211, 100%, 50%; 
+      --color-darkgray: hsl(240, 3%, 12%);
+      --color-fadedlightgray: hsl(0, 0%, 92%);
+      --color-green: hsl(135, 59%, 49%);
+      --color-midgray: hsl(240, 4%, 27%);
+      --color-light: hsl(0, 0%, 100%);
+      --color-lightgray: hsl(0, 0%, 66%);
+      --color-orange: hsl(35, 100%, 50%);
+      --color-red: hsl(3, 100%, 59%);
+      --color-red-hsl: 3, 100%, 59%; 
+      --color-yellow: hsl(48, 100%, 50%);
+      --font-family: "SF Pro Text","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif;
+      --gap: 0.5rem;
+      --height-header: calc(1rem * 3.25);
+      --icon-alert: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 485.811 485.811" style="enable-background:new 0 0 485.811 485.811;" xml:space="preserve"><path d="M476.099,353.968l-170.2-294.8c-27.8-48.7-98.1-48.7-125.8,0l-170.3,294.8c-27.8,48.7,6.8,109.2,62.9,109.2h339.9C468.699,463.168,503.899,402.068,476.099,353.968z M242.899,397.768c-14.8,0-27.1-12.3-27.1-27.1s12.3-27.1,27.1-27.1c14.8,0,27.1,12.3,26.5,27.8C270.099,385.468,257.099,397.768,242.899,397.768z M267.599,222.568c-1.2,21-2.5,41.9-3.7,62.9c-0.6,6.8-0.6,13-0.6,19.7c-0.6,11.1-9.3,19.7-20.4,19.7s-19.7-8-20.4-19.1c-1.8-32.7-3.7-64.8-5.5-97.5c-0.6-8.6-1.2-17.3-1.9-25.9c0-14.2,8-25.9,21-29.6c13-3.1,25.9,3.1,31.5,15.4c1.9,4.3,2.5,8.6,2.5,13.6C269.499,195.468,268.199,209.068,267.599,222.568z"/></svg>');
+      --icon-au: url(../img/AUicon27x27.png);
+      --icon-email: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 75.294 75.294" style="enable-background:new 0 0 75.294 75.294;" xml:space="preserve"><path d="M66.097,12.089h-56.9C4.126,12.089,0,16.215,0,21.286v32.722c0,5.071,4.126,9.197,9.197,9.197h56.9c5.071,0,9.197-4.126,9.197-9.197V21.287C75.295,16.215,71.169,12.089,66.097,12.089z M61.603,18.089L37.647,33.523L13.691,18.089H61.603z M66.097,57.206h-56.9C7.434,57.206,6,55.771,6,54.009V21.457l29.796,19.16c0.04,0.025,0.083,0.042,0.124,0.065c0.043,0.024,0.087,0.047,0.131,0.069c0.231,0.119,0.469,0.215,0.712,0.278c0.025,0.007,0.05,0.01,0.075,0.016c0.267,0.063,0.537,0.102,0.807,0.102c0.001,0,0.002,0,0.002,0c0.002,0,0.003,0,0.004,0c0.27,0,0.54-0.038,0.807-0.102c0.025-0.006,0.05-0.009,0.075-0.016c0.243-0.063,0.48-0.159,0.712-0.278c0.044-0.022,0.088-0.045,0.131-0.069c0.041-0.023,0.084-0.04,0.124-0.065l29.796-19.16v32.551C69.295,55.771,67.86,57.206,66.097,57.206z"/></svg>');
+      --icon-external-link: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26"><path d="M18,17.759v3.366C18,22.159,17.159,23,16.125,23H4.875C3.841,23,3,22.159,3,21.125V9.875C3,8.841,3.841,8,4.875,8h3.429l3.001-3h-6.43C2.182,5,0,7.182,0,9.875v11.25C0,23.818,2.182,26,4.875,26h11.25C18.818,26,21,23.818,21,21.125v-6.367L18,17.759z"/><path d="M22.581,0H12.322c-1.886,0.002-1.755,0.51-0.76,1.504l3.22,3.22l-5.52,5.519c-1.145,1.144-1.144,2.998,0,4.141l2.41,2.411c1.144,1.141,2.996,1.142,4.14-0.001l5.52-5.52l3.16,3.16c1.101,1.1,1.507,1.129,1.507-0.757L26,3.419C25.999-0.018,26.024-0.001,22.581,0z"/></svg>');
+      --icon-filter-active: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="971.986px" height="971.986px" viewBox="0 0 971.986 971.986" style="enable-background:new 0 0 971.986 971.986;" xml:space="preserve"><path d="M370.216,459.3c10.2,11.1,15.8,25.6,15.8,40.6v442c0,26.601,32.1,40.101,51.1,21.4l123.3-141.3c16.5-19.8,25.6-29.601,25.6-49.2V500c0-15,5.7-29.5,15.8-40.601L955.615,75.5c26.5-28.8,6.101-75.5-33.1-75.5h-873c-39.2,0-59.7,46.6-33.1,75.5L370.216,459.3z"/></svg>');
+      --icon-filter: url('data:image/svg+xml;charset=utf-8,<svg width="512px" height="512px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path fill="var(--ci-primary-color, currentColor)" d="M238.627,496H192V253.828l-168-200V16H480V53.612l-160,200V414.627ZM224,464h1.373L288,401.373V242.388L443.51,48H60.9L224,242.172Z"/></svg>');
+      --icon-gear: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 478.703 478.703" style="enable-background:new 0 0 478.703 478.703;" xml:space="preserve"><path d="M454.2,189.101l-33.6-5.7c-3.5-11.3-8-22.2-13.5-32.6l19.8-27.7c8.4-11.8,7.1-27.9-3.2-38.1l-29.8-29.8c-5.6-5.6-13-8.7-20.9-8.7c-6.2,0-12.1,1.9-17.1,5.5l-27.8,19.8c-10.8-5.7-22.1-10.4-33.8-13.9l-5.6-33.2c-2.4-14.3-14.7-24.7-29.2-24.7h-42.1c-14.5,0-26.8,10.4-29.2,24.7l-5.8,34c-11.2,3.5-22.1,8.1-32.5,13.7l-27.5-19.8c-5-3.6-11-5.5-17.2-5.5c-7.9,0-15.4,3.1-20.9,8.7l-29.9,29.8c-10.2,10.2-11.6,26.3-3.2,38.1l20,28.1c-5.5,10.5-9.9,21.4-13.3,32.7l-33.2,5.6c-14.3,2.4-24.7,14.7-24.7,29.2v42.1c0,14.5,10.4,26.8,24.7,29.2l34,5.8c3.5,11.2,8.1,22.1,13.7,32.5l-19.7,27.4c-8.4,11.8-7.1,27.9,3.2,38.1l29.8,29.8c5.6,5.6,13,8.7,20.9,8.7c6.2,0,12.1-1.9,17.1-5.5l28.1-20c10.1,5.3,20.7,9.6,31.6,13l5.6,33.6c2.4,14.3,14.7,24.7,29.2,24.7h42.2c14.5,0,26.8-10.4,29.2-24.7l5.7-33.6c11.3-3.5,22.2-8,32.6-13.5l27.7,19.8c5,3.6,11,5.5,17.2,5.5l0,0c7.9,0,15.3-3.1,20.9-8.7l29.8-29.8c10.2-10.2,11.6-26.3,3.2-38.1l-19.8-27.8c5.5-10.5,10.1-21.4,13.5-32.6l33.6-5.6c14.3-2.4,24.7-14.7,24.7-29.2v-42.1C478.9,203.801,468.5,191.501,454.2,189.101z M451.9,260.401c0,1.3-0.9,2.4-2.2,2.6l-42,7c-5.3,0.9-9.5,4.8-10.8,9.9c-3.8,14.7-9.6,28.8-17.4,41.9c-2.7,4.6-2.5,10.3,0.6,14.7l24.7,34.8c0.7,1,0.6,2.5-0.3,3.4l-29.8,29.8c-0.7,0.7-1.4,0.8-1.9,0.8c-0.6,0-1.1-0.2-1.5-0.5l-34.7-24.7c-4.3-3.1-10.1-3.3-14.7-0.6c-13.1,7.8-27.2,13.6-41.9,17.4c-5.2,1.3-9.1,5.6-9.9,10.8l-7.1,42c-0.2,1.3-1.3,2.2-2.6,2.2h-42.1c-1.3,0-2.4-0.9-2.6-2.2l-7-42c-0.9-5.3-4.8-9.5-9.9-10.8c-14.3-3.7-28.1-9.4-41-16.8c-2.1-1.2-4.5-1.8-6.8-1.8c-2.7,0-5.5,0.8-7.8,2.5l-35,24.9c-0.5,0.3-1,0.5-1.5,0.5c-0.4,0-1.2-0.1-1.9-0.8l-29.8-29.8c-0.9-0.9-1-2.3-0.3-3.4l24.6-34.5c3.1-4.4,3.3-10.2,0.6-14.8c-7.8-13-13.8-27.1-17.6-41.8c-1.4-5.1-5.6-9-10.8-9.9l-42.3-7.2c-1.3-0.2-2.2-1.3-2.2-2.6v-42.1c0-1.3,0.9-2.4,2.2-2.6l41.7-7c5.3-0.9,9.6-4.8,10.9-10c3.7-14.7,9.4-28.9,17.1-42c2.7-4.6,2.4-10.3-0.7-14.6l-24.9-35c-0.7-1-0.6-2.5,0.3-3.4l29.8-29.8c0.7-0.7,1.4-0.8,1.9-0.8c0.6,0,1.1,0.2,1.5,0.5l34.5,24.6c4.4,3.1,10.2,3.3,14.8,0.6c13-7.8,27.1-13.8,41.8-17.6c5.1-1.4,9-5.6,9.9-10.8l7.2-42.3c0.2-1.3,1.3-2.2,2.6-2.2h42.1c1.3,0,2.4,0.9,2.6,2.2l7,41.7c0.9,5.3,4.8,9.6,10,10.9c15.1,3.8,29.5,9.7,42.9,17.6c4.6,2.7,10.3,2.5,14.7-0.6l34.5-24.8c0.5-0.3,1-0.5,1.5-0.5c0.4,0,1.2,0.1,1.9,0.8l29.8,29.8c0.9,0.9,1,2.3,0.3,3.4l-24.7,34.7c-3.1,4.3-3.3,10.1-0.6,14.7c7.8,13.1,13.6,27.2,17.4,41.9c1.3,5.2,5.6,9.1,10.8,9.9l42,7.1c1.3,0.2,2.2,1.3,2.2,2.6v42.1H451.9z"/><path d="M239.4,136.001c-57,0-103.3,46.3-103.3,103.3s46.3,103.3,103.3,103.3s103.3-46.3,103.3-103.3S296.4,136.001,239.4,136.001z M239.4,315.601c-42.1,0-76.3-34.2-76.3-76.3s34.2-76.3,76.3-76.3s76.3,34.2,76.3,76.3S281.5,315.601,239.4,315.601z"/></svg>');
+      --icon-hold: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 466.008 466.008" style="enable-background:new 0 0 466.008 466.008;" xml:space="preserve"><path d="M233.004,0C104.224,0,0,104.212,0,233.004c0,128.781,104.212,233.004,233.004,233.004c128.782,0,233.004-104.212,233.004-233.004C466.008,104.222,361.796,0,233.004,0z M244.484,242.659l-63.512,75.511c-5.333,6.34-14.797,7.156-21.135,1.824c-6.34-5.333-7.157-14.795-1.824-21.135l59.991-71.325V58.028c0-8.284,6.716-15,15-15s15,6.716,15,15v174.976h0C248.004,236.536,246.757,239.956,244.484,242.659z"/></svg>');
+      --icon-idle: url('data:image/svg+xml;charset=utf-8,<svg width="8px" height="8px" viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"><path d="M2.72 0c-1.58.53-2.72 2.02-2.72 3.78 0 2.21 1.79 4 4 4 1.76 0 3.25-1.14 3.78-2.72-.4.13-.83.22-1.28.22-2.21 0-4-1.79-4-4 0-.45.08-.88.22-1.28z" /></svg>');
+      --icon-info: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 490.667 490.667" style="enable-background:new 0 0 490.667 490.667;" xml:space="preserve"><path d="M245.333,0C110.059,0,0,110.059,0,245.333s110.059,245.333,245.333,245.333s245.333-110.059,245.333-245.333S380.608,0,245.333,0z M245.333,85.333c29.397,0,53.333,23.936,53.333,53.333S274.731,192,245.333,192S192,168.064,192,138.667S215.936,85.333,245.333,85.333z M309.333,405.333H202.667c-17.643,0-32-14.357-32-32c0-17.643,14.357-32,32-32h10.667v-64h-10.667c-17.643,0-32-14.357-32-32s14.357-32,32-32H288c5.888,0,10.667,4.779,10.667,10.667v117.333h10.667c17.643,0,32,14.357,32,32C341.333,390.976,326.976,405.333,309.333,405.333z"/></svg>');
+      --icon-triangle: url('data:image/svg+xml;charset=utf-8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" fill-opacity="0%" fill="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>');
+      --icon-us: url(../img/USicon27x27.png);
+      --icon-size: 2rem;
+      --icon-size-open-close: 1.5rem;
+      --letter-spacing: -0.01em;
+      --line-height: 1;
+      --width-max-view: 980px;
+      font-family: var(--font-family);
+      font-size: 16px;
+      letter-spacing: var(--letter-spacing);
+      line-height: var(--line-height);
+    }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--height-header);
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header, footer {
+      background-color: var(--color-darkgray);
+      color: var(--color-lightgray);
+    }
+    header {
+      padding: calc(var(--gap) * 2) calc(var(--gap) * 2) calc(var(--gap) * 1) calc(var(--gap) * 2); 
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    main {
+      background-color: var(--color-darkgray);
+      flex: 1 1 80vh;
+      padding: var(--gap);
+    }
+    main > section, footer > div {
+      max-width: var(--width-max-view);
+      margin: 0 auto;
+    }
+    footer {
+      border-style: ridge;
+      border-width: calc(var(--border-width) * 2) 0 0 0;
+      border-color: var(--color-midgray);
+      font-size: 0.75rem;
+      --line-height: 1.6;
+      line-height: var(--line-height);
+      padding: calc(var(--gap) * 2); 
+    }
+    a {
+      color: var(--color-lightgray);
+    }
+    a[href^="#user-info"] {
+      background-color: var(--color-darkgray);
+      display: var(--data-settings-user-info-display); /*inline-block;*/
+      height: 1em;
+      mask-image: var(--icon-info);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-image: var(--icon-info);
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      margin: 0 calc(1em / 4);
+      width: 1em;
+    }
+    a[href*="//"]::after {
+      content: '';
+      display: inline-block;
+      height: 1em;
+      mask-image: var(--icon-external-link);
+      margin: 0 0 calc(1em / -8) calc(1em / 4);
+      -webkit-mask-image: var(--icon-external-link);
+      width: 1em;
+    }
+    a[href*="//"]::after {
+      background-color:var(--color-lightgray);
+    }
+    input[type="checkbox"] {
+      background-color: var(--color-blue);
+    }
+    input[type="checkbox"][name="data-x-filter-control-toggle"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: var(--color-darkgray);
+      cursor: inherit;
+      display: inline-block;
+      height: 1em;
+      mask-image: var(--icon-filter);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-image: var(--icon-filter);
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      margin: 0 calc(1em / 4);
+      width: 1em;
+    }
+    q {
+      font-style: italic;
+    }
+    section > h2 {
+      display: none;
+    }
+    summary {
+      outline: none;
+    }
+    summary::-webkit-details-marker, 
+    summary::marker {
+      display: none;
+      content: "";
+    }
+    time {
+      white-space: nowrap;
+    }
+  </style>
+  
+  <style> /** <x-page-header> *********************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA
+    * 1. Trading day date 
+    * DESCENDANT COMPONENTS
+    *    <x-user-menu>
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    details[open]
+    * 2. Underlying UI Structure
+    * 3. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    x-page-header > details {
+      --header-settings-button-mask-image: var(--icon-gear);
+      --header-close-button-display: none;
+      --header-summary-border-radius: revert;
+    }
+    x-page-header > details[open] {
+      --header-settings-button-mask-image: none;
+      --header-summary-border-radius: 50%;
+      --header-close-button-display: flex;
+    }
+   /***** Underlying UI Structure ****************************************************************/
+    x-page-header {
+      display: grid;
+      grid-template-columns: 1.5rem auto 1.5rem;
+      grid-template-areas: "home title settings";
+      max-width: var(--width-max-view);
+      margin: 0 auto;
+    }
+    /* AI logo icon and 'AI Investing' name */
+    x-page-header > a {
+      grid-area: home;
+      place-self: start;
+      display: flex;
+      flex-direction: row;
+      text-decoration: none;
+    }
+    /* AI logo icon */
+    x-page-header > a > img {
+      height: 1.5rem;
+    }
+    /* 'AI Investing' name alongside logo icon */
+    x-page-header > a > span {
+      display: none; 
+      font-weight: bold;
+      padding-inline-start: calc(var(--gap) / 2);
+      white-space: nowrap;
+    }
+    /* Trading day date */
+    x-page-header > h1 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      grid-area: title;
+      margin: calc(var(--gap) * -1) 0 0 0;
+      padding: 0;
+      place-self: start center;
+      text-align: center;
+    }
+    /* Trading day date prefix text */
+    x-page-header > h1 > span {
+      font-size: 0.5em;
+      font-weight: 300;
+      display: block;
+    }
+    /* Container for x-user-menu */
+    x-page-header > details {
+      grid-column: 1 / 4;
+      grid-row: 1 / 1;
+      text-align: right;
+    }
+    /* Settings button to open x-user-menu */
+    x-page-header > details > summary {
+      border-radius: var(--header-summary-border-radius);
+      display: inline-block;
+      height: var(--icon-size-open-close);
+      mask-image: var(--header-settings-button-mask-image);
+      -webkit-mask-image: var(--header-settings-button-mask-image);
+      width: var(--icon-size-open-close);
+    }
+    /* Close button to close x-user-menu */
+    x-page-header > details > summary::after {
+      align-items: center;
+      content: "X";
+      display: var(--header-close-button-display);
+      font-weight: bold;
+      height: var(--icon-size-open-close);
+      justify-content: center;
+      width: var(--icon-size-open-close);
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    /* AI logo icon and 'AI Investing' name */
+    x-page-header > a {
+      color: var(--color-lightgray);
+    }
+    /* Settings button to open x-user-menu */
+    x-page-header > details > summary {
+      background-color: var(--color-lightgray);
+    }
+    /* Close button to close x-user-menu */
+    x-page-header > details > summary::after {
+      color: var(--color-darkgray);
+    }
+  </style>
+
+  <style> /** <x-user-menu> ***********************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA
+    * 1. NYSE operating dates and times 
+    * 2. ASX operating dates and times
+    * 3. Current trading day date and historical trading day list in reverse chronological order
+    * 4. User profile:
+    *    a) user name
+    *    b) list of subscribed strategies, associated exchanges, markets and fact sheets
+    *    c) user configuration (e.g. level)
+    * DESCENDANT COMPONENTS
+    *    None.
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) x-user-menu[data-user-level]
+    *    b) body[data-settings-market]
+    * 2. Global Settings Control On State Management
+    *    a) body[data-settings-exchanges]
+    * 3. Underlying UI Structure
+    * 4. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    x-user-menu {
+      --menu-item-display: block;
+      --data-settings-exchange-display: none;
+    }
+    x-user-menu > div:nth-last-of-type(1) {
+      --menu-item-display: flex;
+    }
+    x-user-menu[data-user-level="basic"] > div:nth-last-of-type(1) [data-level="advanced"] {
+      --menu-item-display: none;
+    }
+    x-user-menu[data-x-filter-exchanges~="AU"] > div:nth-of-type(1) > fieldset[data-exchange="AU"],
+    x-user-menu[data-x-filter-exchanges~="US"] > div:nth-of-type(1) > fieldset[data-exchange="US"] {
+      --data-settings-exchange-display: block;
+    }
+    /***** Underlying UI Structure ****************************************************************/
+    x-user-menu {
+      --min-col-width: 25ch;
+      --line-height: 1.3;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0 var(--gap);
+      line-height: var(--line-height);
+      text-align: left;
+    }
+    /* First (left) menu column: exchange operational details */
+    x-user-menu > div:nth-of-type(1) {
+      flex: 1 1 var(--min-col-width);
+    }
+    /* Second (right) menu column: user settings, navigation and login */
+    x-user-menu > div:nth-last-of-type(1) {
+      flex: 2 2 calc(var(--min-col-width) * 2);
+    }
+    /* Default styling for all fieldsets in both columns */
+    x-user-menu fieldset {
+      border-style: solid;
+      border-width: var(--border-width);
+      border-radius: var(--border-radius);
+      margin: var(--gap) 0 0 0;
+    }
+    /* Default styling for all labels in all fieldsets in both columns */
+    x-user-menu fieldset > label {
+      display: var(--menu-item-display);
+    }
+    /* Exchange operational details, container */
+    x-user-menu > div:nth-of-type(1) > fieldset {
+      display: var(--data-settings-exchange-display);
+    }
+    /* Exchange operational details, content container */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl  {
+      margin: 0;
+    }
+    /* Exchange operational details label and content container */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      gap: 0 var(--gap);
+      margin: var(--gap) 0 0 0;
+    }
+    /* Exchange operational details tradings days/session hours label  */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div > dt {
+      flex: 0 0 100%;
+      font-weight: bold;
+      margin: 0 0 0 calc(var(--gap)/4); 
+    }
+    /* Exchange operational details, link to exchange */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div > dt > a {
+      text-decoration: none;
+    }
+    /* Exchange operational details: last/next trading days and open/close times */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div > dd:not(:nth-of-type(3)) {
+      border-style: solid;
+      border-width: var(--border-width);
+      border-radius: var(--border-radius);
+      flex: 1 1 var(--min-col-width);
+      margin: calc(var(--gap)/2) 0;
+      padding: 0;
+      white-space: nowrap;
+    }
+    /* Exchange operational details: special note for exchange holidays (not always present) */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div > dd:nth-of-type(3) {
+      font-style: italic;
+      margin: 0 0 0 calc(var(--gap)/2); 
+    }
+    /* Exchange operational details: Last/Next and Open/Close labels */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div > dd > span {
+      border: solid var(--border-width) var(--color-darkgray);      
+      border-radius: var(--border-radius) 0 0 var(--border-radius);
+      display: inline-block;
+      padding: 0 0 0 calc(var(--gap)/2);
+      width: 6ch;
+    }
+    /* Exchange operational details: Last/Next dates and Open/Close times */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div > dd > time {
+      font-weight: bold;
+      padding: 0 0 0 calc(var(--gap)/2);
+      white-space: nowrap;
+    }
+    /* Column 2: defatult settings item label */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label {
+      flex-direction: row;
+      padding-block-start: var(--gap); padding-top: var(--gap);
+    }
+    /* Column 2: default simple label for checkbox */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label > span {
+      display: inline-block;
+      padding-top: calc(var(--gap) / 4);
+    }
+    /* Column 2: default checkbox */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label > input[type="checkbox"] {
+      flex: 0 0 1rem;
+      height: 1rem;
+      min-height: 1rem;
+      min-width: 1rem;
+      margin: calc(var(--gap)/2) var(--gap) calc(var(--gap)/2) 0;
+      width: 1rem;
+    }
+    /* Column 2: default checkbox label */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label > input[type="checkbox"] + dl {
+      flex: 1 1 auto;
+    }
+    /* Column 2: default label child elements */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label :where(dl, dd, dt) {
+      display: inline;
+      margin: 0;
+    }
+    /* Column 2: default label term */    
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label > dl > dt {
+      font-weight: bold;
+    }
+    /* Column 2: default label term punctuation */    
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label > dl > dt::after {
+      content: ": ";
+    }
+    /* Column 2: default label description */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label > dl > dd {
+      font-style: italic;
+    }
+    /* Column 2: default unordered list */    
+    x-user-menu > div:nth-last-of-type(1) > fieldset > nav > ul {
+      margin: 0 0 0 1.5rem;
+      padding: 0;
+    }
+    /* Column 2: default unordered list item */    
+    x-user-menu > div:nth-last-of-type(1) > fieldset > nav > ul > li {
+      display: block;
+      margin: var(--gap) 0 0 0;
+      text-decoration: none;
+    }
+    /* Column 2: default unordered list item link */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > nav > ul > li > a {
+      text-underline-offset: 0em;
+      text-decoration-skip: spaces;
+      text-decoration-skip: edges;
+    }
+    /* Column 2: default paragraph and unordered list  */
+    x-user-menu > div:nth-last-of-type(1) > fieldset :where(p, ul) {
+      margin: 0 0 var(--gap) 0;
+    }
+    /* Column 2: default button  */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > button {
+      border-radius: var(--border-radius);
+      border-style: outset;
+      border-width: var(--border-width);
+      font-size: 1rem;
+      font-weight: bold;
+      padding: calc(var(--gap)/2) var(--gap);
+    }
+    /* Trading day selection: container label and list */
+    x-user-menu > div:nth-last-of-type(1) > fieldset:nth-of-type(1) > label:nth-of-type(1) {
+      flex-wrap: wrap;
+      gap: 0 var(--gap);
+    }
+    /* Trading day selection: trading day list */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label > select {
+      background-color: var(--color-lightgray);
+      border-radius: var(--border-radius);
+      border: outset var(--border-width) var(--color-lightgray);
+      flex: 1 1 16ch;
+      font-size: 1rem;
+      font-weight: bold;
+      height: 2rem;
+      margin: calc(var(--gap)/2) 0;
+    }
+    /* Trading day selection: label */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label > select + dl {
+      flex: 1 1 calc(var(--min-col-width) * 1.75);
+      order: -1;
+    }
+    /* User info icon */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > label > dl > dd > a[href^="#user-info"] {
+      background-color: var(--color-lightgray);
+      margin-bottom: calc(var(--gap) / -4);
+    }
+    /* Instrument filter component */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > x-filter {
+      display: flex;
+      gap: 0 calc(var(--gap) / 2);
+      padding: 0;
+    }
+    /* Fieldsets within instrument filter */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > x-filter > fieldset {
+      flex-direction: row;
+    }
+    /* Checkboxes in instrument filters settings */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > x-filter > fieldset > label > input {
+      margin-right: var(--gap);
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    /* Default styling for all fieldsets in both columns */
+    x-user-menu fieldset {
+      border-color: var(--color-midgray);
+    }
+    /* Default styling for filter in user menu */
+    x-user-menu x-filter {
+      color: var(--color-lightgray);
+    }
+    /* Exchange operational details: last/next trading days and open/close times */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div > dd:not(:nth-of-type(3)) {
+      background-color: var(--color-lightgray);
+    }
+    /* Exchange operational details: Last/Next and Open/Close labels */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div > dd > span {
+      background-color: var(--color-darkgray);
+    }
+    /* Exchange operational details: Last/Next dates and Open/Close times */
+    x-user-menu > div:nth-of-type(1) > fieldset > dl > div > dd > time {
+      color: var(--color-darkgray);
+    }
+    /* Column 2: default button  */
+    x-user-menu > div:nth-last-of-type(1) > fieldset > button {
+      background-color: var(--color-lightgray);
+      border-color: var(--color-lightgray);
+    }
+  </style>
+
+  <style> /** <x-user-info> ***********************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA
+    * 1. Unlimited key-value pairs: key = unique html id, value = valid html document fragment. 
+    *    Anchors throughout the page (typically on an 'info' icon) link to the keys.
+    * DESCENDANT COMPONENTS
+    *    None.
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) x-user-info > div[id]:target
+    * 2. Underlying UI Structure
+    * 3. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    x-user-info  > div[id] {
+      --user-info-display: none;
+    }
+    body:target x-user-info > div[id] {
+      --user-info-display: var(--user-info-full-help-display);
+    }
+    x-user-info  > div[id]:target {
+      --user-info-display: flex;
+    }
+   /***** Underlying UI Structure ****************************************************************/
+    x-user-info {
+      --line-height: 1.3;
+      background-color: var(--color-darkgray);
+      display: block;
+      line-height: var(--line-height);
+      max-width: var(--width-max-view);
+      margin: 0 auto;
+    }
+    /* Container for info icon and html document fragment with unique id */
+    x-user-info  > div[id] {
+      align-items: center;
+      border-style: solid;
+      border-width: var(--border-width);
+      border-radius: var(--border-radius);
+      display: var(--user-info-display);
+      justify-content: flex-start;
+      margin: calc(var(--gap) * 2) 0 0 0;
+      width: calc(100% - var(--icon-size-open-close) * 0.5 + var(--border-width));
+    }
+    /* Container for info icon */
+    x-user-info > div[id] > div:nth-of-type(1) {
+      flex: 0 0 calc(var(--icon-size) + var(--gap));
+      align-self: stretch;
+      min-height: var(--icon-size);
+      padding: calc(var(--gap)/2) var(--gap);
+    }
+    /* Info icon */
+    x-user-info > div[id] > div:nth-of-type(1) > span {
+      display: block;
+      height: 100%;
+      mask-image: var(--icon-info);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-image: var(--icon-info);
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      width: 100%;
+    }
+    /* Container for html document fragment content*/
+    x-user-info > div[id] > div:nth-last-of-type(1) {
+      columns: 18em 1;
+      column-rule: calc(var(--border-width) / 2) solid var(--color-midgray);
+      flex: 1;
+      padding: var(--gap) 0;
+    }
+    /* Last element (unknown type) of html document fragment */
+    x-user-info > div[id] > div:nth-last-of-type(1) > *:last-child {
+      padding-bottom: 0;
+    }
+    /* Default styling for paragraphs within html document fragment */
+    x-user-info > div[id] > div:nth-last-of-type(1) > p {
+      margin: 0;
+      padding-bottom: var(--gap);
+    }
+    /* Default styling for link elements within html document fragment */ 
+    x-user-info > div[id] > a {
+      align-self: flex-start;
+      display: block;
+      margin: calc(var(--icon-size-open-close)/-2) calc(var(--icon-size-open-close) / -2) 0 0;
+      text-decoration: none;
+    }
+    /* Close icon top-right corner of user-info box */
+    x-user-info > div[id] > a::after {
+      align-items: center;
+      border-radius: 50%;
+      content: "X";
+      cursor: pointer;
+      display: flex;
+      font-weight: bold;
+      height: var(--icon-size-open-close);
+      justify-content: center;
+      width: var(--icon-size-open-close);
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    /* Info icon */
+    x-user-info > div[id] > div:nth-of-type(1) > span {
+      background-color: var(--color-yellow);
+    }
+    /* Close icon top-right corner of user-info box */
+    x-user-info > div[id] > a::after {
+      background-color: var(--color-lightgray);
+      color: var(--color-darkgray);
+    }
+    /* Container for info icon and html document fragment with unique id */
+    x-user-info  > div[id] {
+      border-color: var(--color-midgray);
+    }
+  </style>
+
+  <style> /** <x-trade-alert> *********************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA 
+    * 1. Collection of strategy actions. If one or more strategies in the collection has an action 
+    *    that is any of enter, exit, switch, rollover, an alert status is presented. If there are 
+    *    none, but there is at least one with a hold action, then a hold status is presented. If 
+    *    there are none, then an idle status is presented.
+    * DESCENDANT COMPONENTS
+    *    None.
+    * ASSOCIATED ELEMENTS
+    * 1. body > hr[data-component="x-trade-alert"]. Must be placed in body element for 'sticky' 
+    *    positioning to work properly in Safari.
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) body > hr[data-component="x-trade-alert"][data-actions], 
+            x-trade-alert[data-actions]
+    * 2. Underlying UI Structure
+    * 3. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    body > hr[data-component="x-trade-alert"],
+    x-trade-alert {
+      --trade-alert-background-color: var(--color-midgray);
+      --trade-alert-border-color: var(--color-midgray);
+      --trade-alert-color: var(--color-lightgray);
+      --trade-alert-icon: var(--icon-idle);
+      --trade-alert-icon-color: var(--color-lightgray);
+      --trade-alert-hr-border-style: solid;
+      --trade-alert-p-border-style: solid;
+    }
+    body > hr[data-component="x-trade-alert"][data-actions~="hold"],
+    x-trade-alert[data-actions~="hold"]{
+      --trade-alert-icon: var(--icon-hold);
+    }
+    body > hr[data-component="x-trade-alert"]:is(
+      [data-actions~="enter"],
+      [data-actions~="exit"],
+      [data-actions~="switch"],
+      [data-actions~="rollover"]),
+    x-trade-alert:is(
+      [data-actions~="enter"],
+      [data-actions~="exit"],
+      [data-actions~="switch"],
+      [data-actions~="rollover"]) {
+      --trade-alert-background-color: var(--color-orange);
+      --trade-alert-border-color: var(--color-orange);
+      --trade-alert-color: var(--color-darkgray);
+      --trade-alert-icon: var(--icon-alert);
+      --trade-alert-icon-color: var(--color-midgray);
+      --trade-alert-hr-border-style: groove;
+      --trade-alert-p-border-style: ridge;
+    }
+   /***** Underlying UI Structure *****************************************************************/
+    /* Trade alert page header bottom border feature */
+    body > hr[data-component="x-trade-alert"] {
+      border-style: var(--trade-alert-hr-border-style);
+      border-width: calc(var(--border-width) * 2) 0 0 0;
+      left: 0;
+      margin: 0;
+      position: sticky;
+      top: var(--height-header);
+    }
+    x-trade-alert {
+      --icon-size-local: calc(var(--icon-size) * 0.7);
+      --line-height: 1.05;
+      line-height: var(--line-height);
+    }
+    /* Trade alert container for alert icon and text */
+    x-trade-alert > p {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      border-style: var(--trade-alert-p-border-style);
+      border-width: 0 0 calc(var(--border-width) * 2) 0;
+      font-weight: 400;
+      margin: calc(var(--gap) * -1) calc(var(--gap) * -1) 0 calc(var(--gap) * -1);
+    }
+    /* Trade alert container for icon */
+    x-trade-alert > p > span:nth-of-type(1) {
+      flex: 0 0 calc(var(--icon-size-local) + var(--gap));
+      align-self: stretch;
+      padding: 0 calc(var(--gap) / 2);
+      min-height: var(--icon-size-local);
+    }
+    /* Trade alert icon */
+    x-trade-alert > p > span:nth-of-type(1) > span {
+      display: block;
+      height: 100%;
+      mask-image: var(--trade-alert-icon);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-image: var(--trade-alert-icon);
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      width: 100%;
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    /* Trade alert page header bottom border feature */
+    body > hr[data-component="x-trade-alert"] {
+      border-color: var(--trade-alert-border-color);
+    }
+    /* Trade alert container for alert icon and text */
+    x-trade-alert > p {
+      background-color: var(--trade-alert-background-color);
+      border-color: var(--trade-alert-border-color);
+      color: var(--trade-alert-color);
+    }  
+    /* Trade alert container for icon */
+    x-trade-alert > p > span:nth-of-type(1) {
+      background-color: var(--trade-alert-background-color);
+    }
+    /* Trade alert icon */
+    x-trade-alert > p > span:nth-of-type(1) > span {
+      background-color: var(--trade-alert-icon-color);
+    }
+  </style>
+
+  <style> /** <x-strategy-status> *****************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA 
+    * 1. Strategy performance: "+" (profit) | "-" (loss) | "0" (neutral)
+    * 2. Strategy action: "hold"|"idle"|"enter"|"exit"|"switch"|"rollover" 
+    * 3. Reference to emailed message: href '#user-info-mail-[id]' where [id] is strategy id. 
+    *    Clicking on the anchor shows the emailed message in the the user-info box in the header.
+    * 4. Strategy name 
+    * DESCENDANT COMPONENTS
+    * 1. <x-position-status> (multiple: 0, 1 or 2) 
+    * 2. <x-component-status> (single: 0 or 1)
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) details[open] 
+    *    b) x-strategy-status[data-performance] 
+    *    c) x-strategy-status[data-action]
+    *    d) body[data-settings-strategy-types]
+    * 2. Media-specific size and orientation management
+    * 3. Underlying UI Structure
+    * 4. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    x-strategy-status {
+      --data-action-summary-box-background-color: var(--color-midgray);
+      --data-action-summary-box-border-color: var(--color-lightgray);
+      --data-action-summary-box-color: var(--color-lightgray);
+      --data-action-summary-box-icon-color: var(--color-lightgray);
+      --data-action-summary-box-icon: var(--icon-hold);
+      --data-performance-summary-box-background-color: var(--color-midgray);
+      --data-performance-summary-box-border-color: var(--color-lightgray);
+      --data-performance-summary-box-color: var(--color-lightgray);
+      --data-performance-summary-box-sign: "";
+      --details-idle-message-display: none;
+    }
+    x-strategy-status > details {
+      --details-marker-background-color: var(--color-lightgray);
+      --details-marker-margin-top: 0;
+      --details-marker-rotation: rotate(90deg);
+      --details-summary-background-color: var(--color-midgray);
+      --details-summary-color: var(--color-light);
+      --details-summary-border-bottom-left-radius: var(--border-radius);
+      --details-summary-border-bottom-right-radius: var(--border-radius);
+      --details-user-info-background-color: var(--color-lightgray);
+    }
+    x-strategy-status > details[open] {
+      --data-performance-summary-box-border-color: var(--color-midgray);
+      --data-action-summary-box-border-color: var(--color-midgray);
+      --details-marker-background-color: var(--color-midgray);
+      --details-marker-margin-top: calc(var(--gap) / -2);
+      --details-marker-rotation: rotate(180deg);
+      --details-summary-background-color: var(--color-lightgray);
+      --details-summary-color: var(--color-darkgray);
+      --details-summary-border-bottom-left-radius: 0;
+      --details-summary-border-bottom-right-radius: 0;
+      --details-user-info-background-color: var(--color-midgray);
+    }
+    x-strategy-status[data-performance="+"] {
+      --data-performance-summary-box-background-color: var(--color-blue);
+      --data-performance-summary-box-border-color: var(--color-blue);
+      --data-performance-summary-box-color: var(--color-light);
+      --data-performance-summary-box-sign: "+";
+    }
+    x-strategy-status[data-performance="-"] {
+      --data-performance-summary-box-background-color: var(--color-red);
+      --data-performance-summary-box-border-color: var(--color-red);
+      --data-performance-summary-box-color: var(--color-light);
+      --data-performance-summary-box-sign: "-";
+    }
+    x-strategy-status:is(
+      [data-action="enter"],
+      [data-action="exit"],
+      [data-action="switch"],
+      [data-action="rollover"]) {
+      --data-action-summary-box-background-color: var(--color-orange);
+      --data-action-summary-box-border-color: var(--color-orange);
+      --data-action-summary-box-color: var(--color-darkgray);
+      --data-action-summary-box-icon-color: var(--color-midgray);
+      --data-action-summary-box-icon: var(--icon-alert);
+    }
+    x-strategy-status[data-action="enter"] {
+      --data-action: "enter";
+    }
+    x-strategy-status[data-action="exit"] {
+      --data-action: "exit";
+    }
+    x-strategy-status[data-action="switch"] {
+      --data-action: "switch";
+    }
+    x-strategy-status[data-action="rollover"] {
+      --data-action: "rollover";
+    }
+    x-strategy-status[data-action="hold"] {
+      --data-action: "hold";
+    }
+    x-strategy-status[data-action="idle"] {
+      --data-action: "idle";
+      --data-action-summary-box-icon: var(--icon-idle);
+      --details-idle-message-display: block;
+      --data-performance-summary-box-entrydate-visibility: hidden;
+    }
+    body[data-settings-strategy-types~="compound"] x-strategy-status[data-strategy-type="compound"],body[data-settings-strategy-types~="simple"] x-strategy-status[data-strategy-type="simple"] {
+      --data-settings-strategy-types-display: block;
+    }
+   /***** Media-specific Size and Orientation Management ******************************************/
+    @media only screen and (max-width: 599px) {
+    /** 
+      * Required because Safari's fit-content property does not work. It adjusts the heading in the 
+      * summary of a strategy so that it is only one line of text for * narrow viewports. On wider 
+      * viewports, the heading can use up to two lines.
+      */
+      /* Container for custom marker for details[open] and close states */
+      x-strategy-status > details > summary > span > span:nth-of-type(1) {
+        --media-iphone-portrait-marker-margin-top: calc(var(--gap) * 2.5);
+      }
+      /* The single allowable <hx> element allowed in a <summary> element */
+      x-strategy-status > details > summary > span > span:nth-of-type(2) > h3 {
+        --media-iphone-portrait-heading-margin-left: calc(var(--gap) * -4.25);
+        --media-iphone-portrait-heading-align-self: flex-start;
+        --media-iphone-portrait-heading-padding-bottom: calc(var(--gap) / 2);
+      }
+      /* Text within <hx>: must be contained to separate its width from heading width flex sizing */
+      x-strategy-status > details > summary > span > span:nth-of-type(2) > h3 > span {
+        --media-iphone-portrait-heading-text-width: fit-content;
+        --media-iphone-portrait-heading-text-max-width: 92vw;
+        --media-iphone-portrait-heading-text-white-space: nowrap;
+      }
+    }
+   /***** Underlying UI Structure *****************************************************************/
+    x-strategy-status {
+      --line-height: 1.2;
+      --width-summary-box: 15.5ch;
+      display: var(--data-settings-strategy-types-display);
+      line-height: var(--line-height);
+      margin: calc(var(--gap) * 3) 0;
+    }
+    x-strategy-status > details > summary {
+      border-bottom-left-radius: var(--details-summary-border-bottom-left-radius);
+      border-bottom-right-radius: var(--details-summary-border-bottom-right-radius);
+      border-top-left-radius: var(--border-radius);
+      border-top-right-radius: var(--border-radius);
+      border-style: solid;
+      border-width: var(--border-width);
+    }
+    /* Container for all markup that is revealed on details[open] */
+    x-strategy-status > details > div {
+      border-radius: 0 0 var(--border-radius) var(--border-radius);
+      border-style: solid;
+      border-width: var(--border-width);
+      overflow-y: hidden;
+      padding: 0 calc(var(--gap) / 2) 0 calc(var(--gap) / 2);
+    }
+    /* Container for all markup that is revealed on details[open] for an idle strategy */
+    x-strategy-status > details > div::before {
+      content: "No positions currently. Scanning daily for opportunities.";
+      display: var(--details-idle-message-display);
+      padding: calc(var(--gap) * 2) calc(1.5rem + var(--gap));
+    }
+    /* Container to create a grid within the summary element */
+    x-strategy-status > details > summary > span {
+      align-items: center;
+      cursor: inherit;
+      display: grid;
+      grid-template-columns: var(--icon-size) auto;
+      padding: calc(var(--gap) / 4);
+      gap: calc(var(--gap) / 2);
+    }
+    /* Container for custom marker for details[open] and close states */
+    x-strategy-status > details > summary > span > span:nth-of-type(1) {
+      grid-column: 1 / 2;
+      margin-top: var(--media-iphone-portrait-marker-margin-top);
+    }
+    /* Custom marker for details[open] and close states */
+    x-strategy-status > details > summary > span > span:nth-of-type(1)::before {
+      content: ''; /* Closest character equivalent '\25B7'; */
+      display: block;
+      height: var(--icon-size);
+      margin-top: var(--details-marker-margin-top);
+      mask-image: var(--icon-triangle);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-image: var(--icon-triangle);
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      transform: var(--details-marker-rotation);
+      width: var(--icon-size);
+    }
+    /* Container to create flexbox for marker, heading, icons and summary boxes */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) {
+      align-items: center;
+      grid-column: 2 / 3;
+      display: flex;
+      flex-wrap: wrap;
+    } 
+    /* The single allowable <hx> element allowed in a <summary> element */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > h3 {
+      align-self: var(--media-iphone-portrait-heading-align-self);
+      align-items: center;
+      display: flex;
+      flex: 9999 9999 auto;
+      margin: 0;
+      margin-top: calc(var(--gap) / -4);
+      margin-left: var(--media-iphone-portrait-heading-margin-left);
+      padding-bottom: var(--media-iphone-portrait-heading-padding-bottom, 0);
+    }
+    /* Text within <hx>: must be contained to separate its width from heading width flex sizing */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > h3 > span {
+      font-weight: normal;
+      max-width: var(--media-iphone-portrait-heading-text-max-width, 23ch);
+      min-width: 12ch;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: var(--media-iphone-portrait-heading-text-width);
+      white-space: var(--media-iphone-portrait-heading-text-white-space);
+    }
+    /* Container to create flexbox for icon box */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > span {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      margin: 0 0 calc(var(--gap) / 4) 0;
+    }
+    /* User information icon */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > span > a[href^="#user-info"] {
+      width: 1.2em;
+      height: 1.2em;
+    }
+    /* Mail message icon (uses and inherits from user-info function) */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > span > a[href*="mail"] {
+      mask-image: var(--icon-email);
+      -webkit-mask-image: var(--icon-email);
+    }
+    /* Container to create flexbox for icons and summary boxes */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span {
+      flex: 1 1 auto;
+      display: flex;
+      gap: 0 calc(var(--gap) / 2);
+    }
+    /* Summary boxes (one for action, one for performance) */    
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > strong {
+      flex: 1 1 auto;
+      height: calc(2 * 1rem * var(--line-height) + var(--gap)*(1/2 + 1/2 + 1/4 + 1/4));
+      min-width: var(--width-summary-box);
+      padding: calc(var(--gap)/2) var(--gap); 
+      border-radius: var(--border-radius);
+      border-style: solid;
+      border-width: var(--border-width);
+      font-weight: normal;
+    }
+    /* Action summary box */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > strong:nth-of-type(1) {
+      align-items: center;
+      display: flex;
+      max-width: var(--width-summary-box);
+    }
+    /* Action summary box icon and inner text */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > strong:nth-of-type(1) > span {
+      padding: 0 0 0 var(--gap);
+    }
+    /* Action summary box icon */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > strong:nth-of-type(1) > span:nth-of-type(1) {
+      height: var(--icon-size);
+      mask-image: var(--data-action-box-icon);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-image: var(--data-action-summary-box-icon);
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      width: var(--icon-size);
+    }
+    /* Action summary box text  */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > strong:nth-of-type(1) > span:nth-of-type(2)::before {
+      content: var(--data-action);
+      text-transform: uppercase;
+    }
+    /* Performance summary box */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span  > strong:nth-of-type(2) {
+      text-align: right;
+    }
+    /* Performance summary box, first line text: symbol */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span  > strong:nth-of-type(2) > span {
+      display: block;
+    }
+    /* Performance summary box, first line text: percentage gain */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span  > strong:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)::before {
+      content: var(--data-performance-summary-box-sign);
+    }
+    /* Performance summary box, first line text: percentage gain */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span  > strong:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)::after {
+      content: "%";
+    }
+    /* Performance summary box, second line text: entry date */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span  > strong:nth-of-type(2) > span:nth-of-type(2) > span:nth-of-type(1)::after {
+      content: ", ";
+      visibility: var(--data-performance-summary-box-entrydate-visibility, visible);
+    }
+    /* Performance summary box, second line text: days duration */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span  > strong:nth-of-type(2) > span:nth-of-type(2) > span:nth-of-type(2)::after {
+      content: " days";
+      font-size: 0.75em;
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    x-strategy-status > details > summary {
+      background-color: var(--details-summary-background-color);
+      border-color: var(--details-summary-background-color);
+      color: var(--details-summary-color);
+    }
+    /* Container for all markup that is revealed on details[open] */
+    x-strategy-status > details > div {
+      background-color: var(--color-light);
+      border-color: var(--color-lightgray);
+    }
+    /* Container for all markup that is revealed on details[open] for an idle strategy */
+    x-strategy-status > details > div::before {
+      color: var(--color-midgray);
+    }
+    /* Custom marker for details[open] and close states */
+    x-strategy-status > details > summary > span > span:nth-of-type(1)::before {
+      background-color: var(--details-marker-background-color);
+    }
+    /* User information and mail icons */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > span > a[href^="#user-info"] {
+      background-color: var(--details-user-info-background-color);
+    }
+    /* Action summary box */
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > strong:nth-of-type(1) {
+      background-color: var(--data-action-summary-box-background-color);
+      border-color: var(--data-action-summary-box-border-color);
+      color: var(--data-action-summary-box-color);
+    }
+    /* Performance summary box */    
+    x-strategy-status > details > summary > span > span:nth-of-type(2) > span > strong:nth-of-type(2) {
+      background-color: var(--data-performance-summary-box-background-color);
+      border-color: var(--data-performance-summary-box-border-color);
+      color: var(--data-performance-summary-box-color);
+    }
+    /* Action summary box icon */
+     x-strategy-status > details > summary > span > span:nth-of-type(2) > span > strong:nth-of-type(1) > span:nth-of-type(1) {
+      background-color: var(--data-action-summary-box-icon-color);
+    }
+  </style>
+  
+  <style> /** <x-position-status> *****************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA 
+    * 1. Position action: "exit"|"enter"|"hold"|"idle"
+    * 2. Position execution date
+    * 3. Position instructions: sentiment, underlying index/market, limit
+    * DESCENDANT COMPONENTS
+    * 1. <x-instrument-status> (maximum one only)
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) x-position-status[data-action] 
+    *    b) details[open] 
+    *    c) x-position-status[data-sentiment]
+    *    d) x-position-status[data-limit]
+    * 2. Underlying UI Structure 
+    * 3. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    x-position-status {
+      --data-action: "hold";
+      --data-action-execution-date-display: none;
+      --data-action-position-detail-display: inline;
+      --data-action-label-container-display: inline-block;
+      --data-action-label-container-width: 10ch;
+      --data-action-label-width: 100%;
+      --data-action-label-border-top-right-radius: var(--border-radius);
+      --data-action-label-border-top-left-radius: var(--border-radius);
+      --data-action-label-background-color: var(--color-midgray);
+      --data-action-label-color: var(--color-light);
+      --data-sentiment: "";
+      --data-sentiment-leading-text: "existing ";
+      --data-sentiment-trailing-text: " position on ";
+      --data-limit-sign: "";
+      --data-limit-trailing-text: " market price ";
+    }
+    x-position-status:is(
+      [data-action="enter"], 
+      [data-action="exit"]) {
+      --data-action-execution-date-display: inline-block;
+      --data-action-position-detail-display: inline;
+      --data-action-label-container-display: block;
+      --data-action-label-container-width: initial;
+      --data-action-label-width: 8ch;
+      --data-action-label-border-top-right-radius: 0;
+      --data-action-label-border-top-left-radius: 0;
+      --data-action-label-background-color: var(--color-orange);
+      --data-action-label-color: var(--color-darkgray);
+    }
+    x-position-status[data-action="idle"] {
+      --data-action: "idle";
+      --data-action-position-detail-display: none;
+      --data-action-label-container-display: inline-block;
+      --data-action-label-color: var(--color-lightgray);
+    }
+    x-position-status[data-action="enter"] {
+      --data-action: "enter";
+      --data-sentiment-leading-text: "new ";
+    }
+    x-position-status[data-action="exit"] {
+      --data-action: "exit";
+    }
+    x-position-status > details {
+      --details-marker-margin-top: calc(var(--gap) / -2);
+      --details-marker-rotation: rotate(90deg);
+      --details-summary-border-bottom-left-radius: var(--border-radius);
+      --details-summary-border-bottom-right-radius: var(--border-radius);
+    }
+    x-position-status > details[open] {
+      --details-marker-margin-top: calc(var(--gap) / -1);
+      --details-marker-rotation: rotate(180deg);
+      --details-summary-border-bottom-left-radius: 0;
+      --details-summary-border-bottom-right-radius: 0;
+    }
+    x-position-status[data-sentiment="bearish"] {
+      --data-sentiment: "bearish";
+    }
+    x-position-status[data-sentiment="bullish"] {
+      --data-sentiment: "bullish";
+    }
+    x-position-status[data-limit="+"] {
+      --data-limit-sign: "+";
+      --data-limit-trailing-text: "% limit ";
+    }
+    x-position-status[data-limit="-"] {
+      --data-limit-sign: "-";
+      --data-limit-trailing-text: "% limit ";
+    }
+   /***** Underlying UI Structure *****************************************************************/
+    x-position-status {
+      --line-height: 1.3;
+      display: block;
+      line-height: var(--line-height);
+      margin: calc(var(--gap) / 2) 0;
+    }
+    x-position-status > details > summary {
+      border-bottom-left-radius: var(--details-summary-border-bottom-left-radius);
+      border-bottom-right-radius: var(--details-summary-border-bottom-right-radius);
+      border-top-left-radius: var(--border-radius);
+      border-top-right-radius: var(--border-radius);
+      border-style: solid;
+      border-width: var(--border-width);
+      padding: 0 calc(var(--gap) / 4) 0 calc(var(--gap) / 2);
+    }    
+    /* Container for all markup that is revealed on details[open] */
+    x-position-status > details > div {
+      border-radius: 0 0 var(--border-radius) var(--border-radius);
+      border-style: solid;
+      border-width: var(--border-width);
+      overflow-y: hidden;
+      padding: calc(var(--gap) / 2);      
+    }
+    /* Container to create a grid within the summary element */
+    x-position-status > details > summary > span {
+      align-items: center;
+      cursor: inherit;
+      display: grid;
+      grid-template-columns: var(--icon-size) auto;
+      padding: calc(var(--gap) / 4) 0 0 0;
+      gap: 0 calc(var(--gap) / 2);
+    }
+    /* Container for custom marker for details[open] and close states */
+    x-position-status > details > summary > span > span {
+      grid-column: 1 / 2;
+    }
+    /* Custom marker for details[open] and close states */
+    x-position-status > details > summary > span > span::before {
+      content: ''; /* Closest character equivalent '\25B7'; */
+      display: block;
+      height: var(--icon-size);
+      margin-top: var(--details-marker-margin-top);
+      mask-image: var(--icon-triangle);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-image: var(--icon-triangle);
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      transform: var(--details-marker-rotation);
+      width: var(--icon-size);
+    }
+    /* The single allowable <hx> element allowed in a <summary> element */
+    x-position-status > details > summary > span > h4 {
+      grid-column: 2 / 3;
+      margin: 0;
+    }
+    /* Container for action label and execution date of position */
+    x-position-status > details > summary > span > h4 > strong {
+      border-radius: var(--border-radius);
+      display: var(--data-action-label-container-display);
+      border-style: solid;
+      border-width: calc(var(--border-width) / 2);
+      margin: 0 calc(var(--gap) / -8);
+      max-width: 26ch;
+      padding: 0;
+      width: var(--data-action-label-container-width);
+    }
+    /* Action label for position */
+    x-position-status > details > summary > span > h4 > strong > span {
+      border-top-left-radius: var(--border-radius);
+      border-bottom-left-radius: var(--border-radius);
+      border-top-right-radius: var(--data-action-label-border-top-right-radius);
+      border-bottom-right-radius: var(--data-action-label-border-top-left-radius);
+      display: inline-block;
+      padding: calc(var(--gap) / 4) var(--gap);
+      text-align: center;
+      text-transform: uppercase;
+      width: var(--data-action-label-width);
+    }
+    /* Action label text */
+    x-position-status > details > summary > span > h4 > strong > span::before {
+      content: var(--data-action);
+    }  
+    /* Execution date for position */
+    x-position-status > details > summary > span > h4 > strong > time {
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
+      display: var(--data-action-execution-date-display);
+      font-weight: normal;
+      padding: calc(var(--gap) / 4) var(--gap);
+    }
+    /* Detailed information on position */
+    x-position-status > details > summary > span > h4 > span {
+      display: var(--data-action-position-detail-display);
+    }
+    /* Detailed information on position: sentiment */
+    x-position-status > details > summary > span > h4 > span:nth-of-type(1)::before {
+      content: var(--data-sentiment-leading-text) var(--data-sentiment);
+    }
+    /* Detailed information on position: sentiment */
+    x-position-status > details > summary > span > h4 > span:nth-of-type(1)::after {
+      content: var(--data-sentiment-trailing-text);
+    }
+    /* Detailed information on position: limit */
+    x-position-status > details > summary > span > h4 > span:nth-of-type(3)::before {
+      content: "@ " var(--data-limit-sign);
+    }
+    /* Detailed information on position: limit */
+    x-position-status > details > summary > span > h4 > span:nth-of-type(3)::after {
+      content: var(--data-limit-trailing-text);
+    }
+    /* User information icon */
+    x-position-status > details > summary > span > h4 > a[href^="#user-info"] {
+      margin: 0 0 calc(var(--gap) / -4) 0;
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    x-position-status > details > summary {
+      background-color: var(--color-lightgray);
+      border-color: var(--color-lightgray);
+    }    
+    /* Custom marker for details[open] and close states */
+    x-position-status > details > summary > span > span::before {
+      background-color: var(--color-midgray);
+    }
+    /* Container for all details that reveal on details [open] */
+    x-position-status > details > div {
+      background-color: var(--color-fadedlightgray);
+      border-color: var(--color-lightgray);
+    }
+    /* Action label and execution date for position */
+    x-position-status > details > summary > span > h4 > strong {
+      background-color: var(--color-midgray);
+      color: var(--color-light);
+      border-color: var(--color-midgray);
+    }
+    /* Action label for position */
+    x-position-status > details > summary > span > h4 > strong > span {
+      background-color: var(--data-action-label-background-color);
+      color: var(--data-action-label-color);
+    }
+    /* Execution date for position */
+    x-position-status > details > summary > span > h4 > strong > time {
+      background-color: var(--color-midgray);
+      color: var(--color-light);
+    }
+    /* User information icon */
+    x-position-status > details > summary > span > h4 > a[href^="#user-info"] {
+      background-color: var(--color-midgray);
+    }
+  </style>
+
+  <style> /** <x-instrument-status> ***************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA 
+    * 1. Position action "buy"|"sell"|"hold"|"idle".
+    * 2. Performance for each instrument:  "+" (profit) | "-" (loss) | "0" (neutral) | must be 
+    *    omitted if position action is "idle".
+    * 3. Each instrument: symbol, action, price, limit, last, performance
+    * 4. Limit for each instrument: "+" (+ve limit) | "-" (-ve limit) | must be omitted if market 
+    *    price (i.e. no limit price)
+    * 5. Type of each instrument: "-3xETF"|"-2xETF"|"-1xETF"|+1xETF"|"+2xETF"|"+3xETF"|
+    *    "PutOption"|"CallOption"
+    * 6. Exchange of each instrument: "xasx"|"arcx"|"xnas"|"bats"|"opra"
+    * DESCENDANT COMPONENTS
+    *    None.
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) x-instrument-status[data-action] 
+    *    b) x-instrument-status > table > tbody[data-performance]
+    *    b) x-instrument-status > table > tbody[data-limit] 
+    *    d) x-instrument-status > table > tbody[data-type]
+    *    e) x-instrument-status > table > tbody[data-exchange]
+    * 2. Underlying UI Structure 
+    * 3. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    x-instrument-status {
+      --data-action: "hold";
+      --data-action-box-background-color: var(--color-midgray);
+      --data-action-box-border-bottom-right-radius: var(--border-radius);
+      --data-action-box-border-top-right-radius: var(--border-radius);
+      --data-action-box-color: var(--color-light);
+      --data-action-font-weight: bold;
+      --data-action-price-box-display: none;
+      --data-action-symbol-box-background-color: var(--color-midgray);
+      --data-action-symbol-box-color: var(--color-light);
+    }
+    x-instrument-status:is([data-action="buy"], [data-action="sell"]) {
+      --data-action-box-background-color: var(--color-orange);
+      --data-action-box-border-bottom-right-radius: 0;
+      --data-action-box-border-top-right-radius: 0;
+      --data-action-box-color: var(--color-darkgray);
+      --data-action-price-box-display: block;
+      --data-action-symbol-box-background-color: var(--color-midgray);
+      --data-action-symbol-box-color: var(--color-light);
+    }
+    x-instrument-status[data-action="buy"] {
+      --data-action: "buy";
+    }
+    x-instrument-status[data-action="sell"] {
+      --data-action: "sell";
+    }
+    x-instrument-status[data-action="idle"] {
+      --data-action: "idle";
+      --data-action-box-color: var(--color-lightgray);
+      --data-action-symbol-box-color: var(--color-lightgray);
+      --data-action-font-weight: normal;
+      --data-action-instrument-details-display: none;
+    }
+    x-instrument-status > table > tbody {
+      --data-performance-sign: "";
+      --data-performance-box-background-color: var(--color-midgray);
+      --data-performance-box-color: var(--color-lightgray);
+      --data-performance-box-color: var(--color-light);
+      --data-limit-sign: "";
+      --data-limit-trailing-text: "(market price) ";
+    }
+    x-instrument-status > table > tbody[data-performance="+"] {
+      --data-performance-sign: "+";
+      --data-performance-box-background-color: var(--color-blue);
+    }
+    x-instrument-status > table > tbody[data-performance="-"] {
+      --data-performance-sign: "-";
+      --data-performance-box-background-color: var(--color-red);
+    }
+    x-instrument-status > table > tbody[data-limit] {
+      --data-limit-trailing-text: "% limit on";
+    }
+    x-instrument-status > table > tbody[data-limit="+"] {
+      --data-limit-sign: "+";
+    }
+    x-instrument-status > table > tbody[data-limit="-"] {
+      --data-limit-sign: "-";
+    }
+    x-instrument-status > table > tbody[data-type~="ETF"] {
+      --data-type-class: "E";
+    }
+    x-instrument-status > table > tbody[data-type~="Option"] {
+      --data-type-class: "O";
+    }
+    x-instrument-status > table > tbody[data-type~="-3x"] {
+      --data-type-subclass: "-3";
+    }
+    x-instrument-status > table > tbody[data-type~="-2x"] {
+      --data-type-subclass: "-2";
+    }
+    x-instrument-status > table > tbody[data-type~="-1x"] {
+      --data-type-subclass: "-1";
+    }
+    x-instrument-status > table > tbody[data-type~="+1x"] {
+      --data-type-subclass: "+1";
+    }
+    x-instrument-status > table > tbody[data-type~="+2x"] {
+      --data-type-subclass: "+2";
+    }
+    x-instrument-status > table > tbody[data-type~="+3x"] {
+      --data-type-subclass: "+3";
+    }
+    x-instrument-status > table > tbody[data-type~="Put"] {
+      --data-type-subclass: "P";
+    }
+    x-instrument-status > table > tbody[data-type~="Call"] {
+      --data-type-subclass: "C";
+    }
+    x-instrument-status > table > tbody[data-exchange] {
+      --data-exchange-icon: var(--icon-us);
+    }
+    x-instrument-status > table > tbody[data-exchange="xasx"] {
+      --data-exchange-icon: var(--icon-au);
+    }
+   /***** Underlying UI Structure *****************************************************************/
+    /* Table caption and header for semantic purposes only */
+    x-instrument-status > table > :is(caption, thead) {
+      display: none;
+    }
+    /* Instrument 'row': actually contains 2 table rows that wrap */
+    x-instrument-status > table > tbody {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: calc(var(--gap) / 4) 0;
+    }
+    /* Instrument 'sub-row': two rows that wrap, within an Instrument 'row' */
+    x-instrument-status > table > tbody > tr {
+      align-items: center;
+      display: flex;
+      flex: 1 1 auto;
+    }
+    /* Instrument 'row' (alternating) */
+    x-instrument-status > table > tbody:nth-of-type(odd) {
+      padding-bottom: calc(var(--gap) / 2);
+    }
+    /* Instrument 'row' (alternating) */
+    x-instrument-status > table > tbody:nth-of-type(even) {
+      padding-top: calc(var(--gap) / 2);
+    }
+    /* Instrument sub-row: containing limit, last price, user-info and performance boxes */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) {
+      display: var(--data-action-instrument-details-display, flex);
+      flex: 1111 1111 auto;
+      justify-content: flex-end;
+    }
+    /* Instrument type user-info icon */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > a[href^="#user-info"]{
+      margin-bottom: calc(var(--gap) / -4);
+      margin-top: calc(var(--gap) / 4);
+    }
+    /* Default styling for all elements */
+    x-instrument-status > table > tbody > tr > td {
+      border-style: solid;
+      border-width: calc(var(--border-width) / 2);
+      flex: 0 0 auto;
+      max-height: calc(1rem * 1.625);
+      padding: calc(var(--gap) / 4) 0;
+      text-align: left;
+    }
+    /* Instrument price box and user-info box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-last-of-type(1),
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(3) {
+      flex: 1 1 auto;
+    }
+    /* Instrument symbol box, price box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(4),
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(6) {
+      border-bottom-right-radius: var(--border-radius);
+      border-top-right-radius: var(--border-radius);
+      border-left: 0;
+    }
+    /* Instrument action box, performance box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(5),  
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(4) {
+      margin-left: calc(var(--gap) / 2);
+    }
+    /* Instrument price box, performance box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(6), 
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(4) {
+      padding-left: var(--gap);
+      padding-right: var(--gap);
+    }
+    /* Instrument type box, type info box, last price box, */
+    x-instrument-status > table > tbody > tr > td:nth-of-type(2), 
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) {
+      border-right: 0;
+      border-left: 0;
+    }
+    /* Instrument exchange box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(1) {
+      background-image:var(--data-exchange-icon);
+      background-repeat: no-repeat;
+      background-position: -2px -1px;
+      border-bottom-left-radius: calc(var(--border-radius) * 1.5);
+      border-top-left-radius: calc(var(--border-radius) * 1.5);
+      border-right: 0;
+      padding-left: var(--gap);
+      padding-right: calc(var(--gap) * 1.4);
+    }
+    /* Instrument type box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(2) {
+      background-position: -3px -3px;
+      background-repeat: no-repeat;
+      background-size: 30px 30px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      height: 100%;
+      letter-spacing: calc(var(--letter-spacing) * 10);
+      position: relative;
+      width: 27px;
+    }
+    /* Instrument type subclass ('numerator' in instrument type box) */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(2)::before {
+      content: var(--data-type-subclass);
+      display: block;
+      left: 0px;
+      position: absolute;
+      top: -2px;
+      text-align: center;
+      width: 60%;
+    }
+    /* Instrument type class ('denominator' in instrument type box) */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(2)::after {
+      bottom: -1px;
+      content: var(--data-type-class);
+      display: block;
+      position: absolute;
+      right: 0px;
+      text-align: center;
+      width: 60%;
+    }
+    /* Instrument symbol box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(4) {
+      font-weight: var(--data-action-font-weight);
+      min-width: 7ch;
+      max-width: 7ch;
+      padding-left: calc(var(--gap) / 2);
+    }
+    /* Instrument action box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(5) {
+      border-bottom-left-radius: var(--border-radius);
+      border-bottom-right-radius: var(--data-action-box-border-bottom-right-radius);
+      border-top-left-radius: var(--border-radius);
+      border-top-right-radius: var(--data-action-box-border-top-right-radius);
+      font-weight: var(--data-action-font-weight);
+      text-align: center;
+      text-transform: uppercase;      
+      width: 9ch;
+    }
+    /* Instrument action box text */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(5)::before {
+      content: var(--data-action);
+    }  
+    /* Instrument price box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(6) {
+      display: var(--data-action-price-box-display);
+      min-width: 9ch;
+    }
+    /* Instrument price box text prefix */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(6)::before {
+      content: "@";
+      padding-right: calc(var(--gap) / 2);
+    } 
+    /* Instrument limit, last price and user-info boxes */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(-n+3) {
+      border: 0;
+      font-size: smaller;
+      padding-top: calc(var(--gap) / 2);
+      padding-bottom: 0;
+    }  
+    /* Instrument limit box */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(1) {
+      padding-left: var(--gap);
+    }
+    /* Instrument limit number sign prefix */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(1)::before {
+      content: var(--data-limit-sign);
+    }
+    /* Instrument price limit number suffix and trailing text */ 
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(1)::after {
+      content: var(--data-limit-trailing-text);
+      padding-right: calc(var(--gap) / 2);
+    } 
+    /* Instrument last price prefix text */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(2)::before {
+      content: "last";
+      padding-right: calc(var(--gap) / 2);
+    }
+    /* Instrument limit user-info box, info icon */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(3) a[href^="#user-info"] {
+      margin-top: calc(var(--gap) / 4);
+      height: 1.2em;
+      width: 1.2em;
+    }
+    /* Instrument performance box */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(4) {
+      border-radius: var(--border-radius);
+      min-width: calc(var(--width-summary-box) - var(--gap));
+      max-width: calc(var(--width-summary-box) - var(--gap));
+      padding-left: var(--gap);
+      text-align: right;
+    }
+    /* Instrument performance text number type suffix */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(4)::after {
+      content: "%";
+    }
+    /* Instrument performance text sign prefix */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(4)::before {
+      content: var(--data-performance-sign);
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    /* Instrument 'row' alternating background shading*/
+    x-instrument-status > table > tbody:nth-of-type(odd) {
+      background-color: var(--color-light);
+    }
+    /* Instrument 'row': all visible elements in all sub-rows */
+    x-instrument-status > table > tbody > tr > td:nth-of-type(-n+6) {
+      border-color: var(--color-midgray);
+    }
+    /* Instrument exchange icon box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(1) {
+      background-color: var(--color-light);
+    }
+    /* Instrument type box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(2) {
+      background-color: var(--color-lightgray);
+      background-image: linear-gradient(-45deg, var(--color-midgray) 50%, var(--color-light) 50%);
+    }
+    /* Instrument type class ('denominator' in instrument type box) */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(2)::after {
+      color: var(--color-lightgray);
+    }
+    /* Instrument type user-info box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) {
+      background-color: var(--color-midgray);
+    }
+    /* Instrument type user-info icon */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > a[href^="#user-info"]{
+      background-color: var(--color-lightgray);
+    }
+    /* Instrument symbol box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(4) {
+      background-color: var(--data-action-symbol-box-background-color);
+      color: var(--data-action-symbol-box-color);
+    }
+    /* Instrument action box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(5) {
+      background-color: var(--data-action-box-background-color);
+      color: var(--data-action-box-color);
+    }
+    /* Instrument price box */
+    x-instrument-status > table > tbody > tr:nth-of-type(1) > td:nth-of-type(6) {
+      background-color: var(--color-midgray);
+      color: var(--color-light);
+    }  
+    /* Instrument limit, last price and user-info: user-info icon */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(3) > a[href^="#user-info"]{
+      background-color: var(--color-midgray);
+    }
+    /* Instrument performance box */
+    x-instrument-status > table > tbody > tr:nth-of-type(2) > td:nth-of-type(4) {
+      background-color: var(--data-performance-box-background-color);
+      color: var(--data-performance-box-color);
+    }
+  </style>
+  
+  <style> /** <x-component-status> ****************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA 
+    * 1. Component action/status "enter"|"exit"|"hold"|"idle".
+    * 2. Performance for each component:  "+" (profit) | "-" (loss) | "0" (neutral) | must be 
+    *    omitted if component action is "idle".
+    * 3. Each component
+    *    a) component name
+    *    b) action/status
+    *    c) days duration
+    *    d) entry date
+    *    e) performance
+    * 4. Each component history for this particular strategy: 
+    *    a) total positions
+    *    b) positions / year
+    *    c) average position duration
+    *    d) % win/loss
+    *    e) % average position gain
+    * DESCENDANT COMPONENTS
+    *    None.
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) x-instrument-status > table > tbody[data-action] 
+    *    b) x-instrument-status > table > tbody[data-performance]
+    *    c) x-instrument-status > table > tbody[data-live] 
+    *    d) x-instrument-status > table > tbody[data-limit] 
+    * 2. Global Settings Control On State Management
+    *    a) body[data-settings-component-maps]
+    * 3. Underlying UI Structure 
+    * 4. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    x-component-status {
+      --alternate-component-background-color: var(--color-fadedlightgray);
+      --cell-height: calc(2.5rem / 2);
+      --data-performance-background-color-opacity: 0.2;
+      --data-performance: "";
+      --data-action: "";
+      --data-limit: "";
+      --data-limit-display: none;
+    }
+    x-component-status > details {
+      --details-marker-margin-top: calc(var(--gap) / -2);
+      --details-marker-rotation: rotate(90deg);
+      --details-summary-border-bottom-left-radius: var(--border-radius);
+      --details-summary-border-bottom-right-radius: var(--border-radius);
+    }
+    x-component-status > details[open] {
+      --details-marker-margin-top: calc(var(--gap) / -1);
+      --details-marker-rotation: rotate(180deg);
+      --details-summary-border-bottom-left-radius: 0;
+      --details-summary-border-bottom-right-radius: 0;
+    }
+    x-component-status > details > div > table > tbody[data-performance="+"] {
+      --data-performance: "+";
+    }
+    x-component-status > details > div > table > tbody[data-performance="-"] {
+      --data-performance: "-";
+    }
+    x-component-status > details > div > table > tbody[data-action="enter"] {
+      --data-action: "ENTER";
+    }
+    x-component-status > details > div > table > tbody[data-action="exit"] {
+      --data-action: "EXIT";
+    }
+    x-component-status > details > div > table > tbody[data-action="hold"] {
+      --data-action: "HOLD";
+    }
+    x-component-status > details > div > table > tbody[data-limit="+"] {
+      --data-limit: "+";
+      --data-limit-display: block;
+    }
+    x-component-status > details > div > table > tbody[data-limit="-"] {
+      --data-limit: "-";
+      --data-limit-display: block;
+    }
+    x-component-status > details > div > table > tbody[data-live="true"] {
+      --data-live-offset: calc(var(--border-width) * -1);
+      --data-live-padding-top: calc(var(--data-live-offset) * -4);
+      --data-live-background-color: var(--color-midgray);
+      --data-live-color: var(--color-light);
+    }
+    x-component-status > details > div > table > tbody[data-performance="+"] {
+      --data-performance-background-color: hsla(
+        var(--color-blue-hsl), 
+        var(--data-performance-background-color-opacity)
+      );
+    }
+    x-component-status > details > div > table > tbody[data-performance="-"] {
+      --data-performance-background-color: hsla(
+        var(--color-red-hsl), 
+        var(--data-performance-background-color-opacity)
+      );
+    }
+   /***** Media-specific Size and Orientation Management ******************************************/
+    @media only screen and (min-width: 667px) {
+      /* Container for custom marker for details[open] and close states */
+      x-component-status {
+        --media-caption-display: none;
+        --media-heading-display: flex;
+        --media-header-margin-block: var(--gap);
+        --media-row-group-display: grid;
+        --media-all-cells-font-size: 0.9rem;
+        --media-row-display: grid;
+        --media-action-column-display: grid;
+        --media-action-column-item-border-width: calc(var(--border-width) / 2);
+        --media-row-last-cell-border-radius: 0;
+        --media-row-last-cell-border-color: var(--color-midgray);
+      }
+    }
+   /***** Underlying UI Structure *****************************************************************/
+    x-component-status {
+      --line-height: 1;
+      --width-summary-box: 9ch;
+      display: var(--data-settings-component-map-display);
+      line-height: var(--line-height);
+      margin: calc(var(--gap) / 2) 0;
+    }
+    x-component-status > details > summary {
+      border-bottom-left-radius: var(--details-summary-border-bottom-left-radius);
+      border-bottom-right-radius: var(--details-summary-border-bottom-right-radius);
+      border-top-left-radius: var(--border-radius);
+      border-top-right-radius: var(--border-radius);
+      border-style: solid;
+      border-width: var(--border-width);
+      padding: 0 calc(var(--gap) / 4) 0 calc(var(--gap) / 2);
+    }    
+    /* Container for all markup that is revealed on details[open] */
+    x-component-status > details > div {
+      border-radius: 0 0 var(--border-radius) var(--border-radius);
+      border-style: solid;
+      border-width: var(--border-width);
+      border-top-width: 0;
+      overflow-y: hidden;
+      padding: calc(var(--gap) / 2);
+    }
+    /* Container to create a grid within the summary element */
+    x-component-status > details > summary > span {
+      align-items: center;
+      cursor: inherit;
+      display: grid;
+      grid-template-columns: var(--icon-size) auto;
+      padding: calc(var(--gap) / 4) 0;
+      gap: 0 calc(var(--gap) / 2);
+    }
+    /* Container for custom marker for details[open] and close states */
+    x-component-status > details > summary > span > span:nth-of-type(1) {
+      grid-column: 1 / 2;
+    }
+    /* Custom marker for details[open] and close states */
+    x-component-status > details > summary > span > span:nth-of-type(1)::before {
+      content: ''; /* Closest character equivalent '\25B7'; */
+      display: block;
+      height: var(--icon-size);
+      /* margin-top: var(--details-marker-margin-top); */
+      mask-image: var(--icon-triangle);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-image: var(--icon-triangle);
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      transform: var(--details-marker-rotation);
+      width: var(--icon-size);
+    }
+    /* Container to create flexbox for heading, icons and summary boxes */
+    x-component-status > details > summary > span > span:nth-of-type(2) {
+      align-items: center;
+      grid-column: 2 / 3;
+      display: flex;
+      flex-wrap: wrap;
+    } 
+    /* The single allowable <hx> element allowed in a <summary> element */
+    x-component-status > details > summary > span > span:nth-of-type(2) > h4 {
+      align-items: flex-start;
+      display: var(--media-heading-display, none);
+      flex: 9999 9999 auto;
+      flex-direction: column;
+      font-weight: normal;
+      gap: calc(var(--gap) / 2) 0;
+      margin: 0;
+      padding-bottom: calc(var(--gap) / 4);
+    }
+    /* Component map instruments of code sequences */
+    x-component-status > details > summary > span > span:nth-of-type(2) > h4 > span > span:nth-of-type(1) {
+      font-weight: bold;
+    }
+    /* Container to create flexbox for icons and summary boxes */
+    x-component-status > details > summary > span > span:nth-of-type(2) > span {
+      flex: 1 1 auto;
+      display: flex;
+      gap: 0 calc(var(--gap) / 2);
+    }
+    /* Container to create flexbox for icon box */
+    x-component-status > details > summary > span > span:nth-of-type(2) > span > span {
+      display: flex;
+      flex-direction: column-reverse;
+      justify-content: space-between;
+      /* margin: calc(var(--gap) / 4) 0 calc(var(--gap) / 4) 0; */
+      margin: 0 0 calc(var(--gap) / 4) 0;
+    }
+    /* User information icon */
+    x-component-status > details > summary > span > span:nth-of-type(2) > span > span > a[href^="#user-info"] {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+    /* Summary boxes (one for each underlying market of the strategy) */    
+    x-component-status > details > summary > span > span:nth-of-type(2) > span > strong {
+      flex: 1 1 auto;
+      min-width: var(--width-summary-box);
+      padding: calc(var(--gap)/2) var(--gap); 
+      border-radius: var(--border-radius);
+      border-style: solid;
+      border-width: var(--border-width);
+      font-weight: normal;
+      text-align: right;
+    }
+    /* Summary boxes underlying market text */    
+    x-component-status > details > summary > span > span:nth-of-type(2) > span > strong > span:nth-of-type(1) {
+      display: block;
+      font-weight: bold;
+    }
+    /* Table caption which contains full component code sequence for strategy */
+    x-component-status > details > div > table > caption {
+      display: var(--media-caption-display, table-caption);
+    }
+    /* Component map code sequence text in caption */ 
+    x-component-status > details > div > table > caption > span {
+      display: block;
+      padding: calc(var(--gap) / 2);
+      margin-top: calc(var(--gap) / -2);
+      text-align: left;
+    }
+    /* Component map instruments of code sequences in caption */ 
+    x-component-status > details > div > table > caption > span > span:nth-of-type(1) {
+      font-weight: bold;
+    }
+    /* Table header */
+    x-component-status > details > div > table > thead {
+      display: var(--media-row-group-display, table-header-group);
+      margin-top: var(--media-header-margin-block);
+      border-bottom-style: groove;
+      border-bottom-width: calc(var(--border-width) * 4);
+    } 
+    /* Table body elements */
+    x-component-status > details > div > table > tbody {
+      display: var(--media-row-group-display, table-row-group);
+      border-radius: var(--border-radius);
+    } 
+    /* Table row-group elements */
+    x-component-status > details > div > table > :is(thead, tbody) {
+      align-items: center;
+      font-size: var(--media-all-cells-font-size, 0.8rem);
+      grid-template-columns: 11fr 4fr;
+    } 
+    /* Table row elements */
+    x-component-status > details > div > table > :is(thead, tbody) > tr {
+      align-items: center;
+      border-style: solid;
+      border-width: calc(var(--border-width) * 2) 0;
+      display: var(--media-row-display, table-row);
+    } 
+    /* All cells in table */
+    x-component-status > details > div > table > :is(thead, tbody) > tr > :is(th, td) { 
+      border: 0;
+      border-right-style: dotted;
+      border-right-width: calc(var(--border-width) / 2);
+      font-weight: normal;
+      white-space: nowrap;
+    }
+    /* Header/component first row */
+    x-component-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) {
+      grid-template-columns: 11ch 2.5fr 1fr 1fr 1fr 1fr 1fr;
+    } 
+    /* Header/component second row */
+    x-component-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(2) {
+      grid-template-columns: 1fr 1fr 1fr;
+    } 
+    /* All 3 cells header/component second row */
+    x-component-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(2) > :is(th, td) {
+      font-weight: bold;
+      height: var(--cell-height);
+    }
+    /* ID column */
+    x-component-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(1) {
+      border-radius: var(--border-radius) 0 0 var(--border-radius);
+      font-weight: bold;
+      height: calc(100% + var(--data-live-offset, 0) * -4);
+      margin-top: var(--data-live-offset, 0);
+      margin-bottom: var(--data-live-offset, 0);
+      padding-top: var(--data-live-padding-top, 0.25em);
+    }
+    /* Action column*/
+    x-component-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) > :is(th, td):nth-of-type(2) {
+      display: var(--media-action-column-display, table-cell);
+      font-weight: bold;
+      grid-template-columns: 1fr 1fr;
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+    /* Action column label and limit text */
+    x-component-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) > :is(th, td):nth-of-type(2) > span {
+      display: block;
+      line-height: var(--cell-height);
+      text-align: center;
+    }
+    /* Action column label */
+    x-component-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) > :is(th, td):nth-of-type(2) > span:nth-of-type(1) {
+      border-right-width: var(--media-action-column-item-border-width, 0);
+      border-right-style: dotted;
+    }
+    /* Action column: action text */
+    x-component-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(2) > span:nth-of-type(1)::before {
+      content: var(--data-action);
+    }
+    /* Action column: limit text */
+    x-component-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(2) > span:nth-of-type(2) {
+      display: var(--data-limit-display);
+    }
+    /* Action column: limit text prefix */
+    x-component-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(2) > span:nth-of-type(2)::before {
+      content: var(--data-limit);
+    }
+    /* Action column: limit text suffix*/
+    x-component-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(2) > span:nth-of-type(2)::after {
+      content: "%";
+    }
+    /* Positions per year column */
+    x-component-status > details > div > table > tbody > tr > td:nth-of-type(4)::after {
+      content: "/yr";
+    }
+    /* Win/loss, average position gain and gain columns */
+    x-component-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(5)::after,
+    x-component-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(7)::after, 
+    x-component-status > details > div > table > tbody > tr:nth-of-type(2) > td:nth-of-type(3)::after {
+      content: "%";
+    }
+    /* Average position gain column */
+    x-component-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(7)::before {
+      content: "+";
+    }
+    /* Gain% column */
+    x-component-status > details > div > table > tbody > tr:nth-of-type(2) > td:nth-of-type(3)::before {
+      content: var(--data-performance);
+    }
+    /* Last cell top row */
+    x-component-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) > :is(th, td):nth-last-of-type(1) {
+      border-top-right-radius: var(--media-row-last-cell-border-radius, var(--border-radius));
+      border-right-color: var(--media-row-last-cell-border-color, transparent);
+    }
+    /* Last cell bottom row */
+    x-component-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(2) > :is(th, td):nth-last-of-type(1) {
+      border-bottom-right-radius: var(--media-row-last-cell-border-radius, var(--border-radius));
+      border-right-color: transparent;
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    x-component-status > details > summary {
+      background-color: var(--details-summary-background-color);
+      border-color: var(--details-summary-background-color);
+      color: var(--details-summary-color);
+    }
+    /* Container for all markup that is revealed on details[open] */
+    x-component-status > details > div {
+      border-color: var(--color-lightgray);
+    }
+    /* Custom marker for details[open] and close states */
+    x-component-status > details > summary > span > span::before {
+      background-color: var(--color-midgray);
+    }
+    /* Component map full code sequence */
+    x-component-status > details > summary > span > span:nth-of-type(2) > h4 {
+      color: var(--color-darkgray);
+    }
+    /* Summary boxes (one for each underlying market of the strategy) */    
+    x-component-status > details > summary > span > span:nth-of-type(2) > span > strong {
+      background-color: transparent;
+      border-color: var(--color-midgray);
+      color: var(--color-midgray);
+    }
+    /* User information icon */
+    x-component-status > details > summary > span > span:nth-of-type(2) > span > span > a[href^="#user-info"] {
+      background-color: var(--color-midgray);
+    }
+    /* All cells */
+    x-component-status > details > div > table > :is(thead, tbody) > tr > :is(th, td) {
+      color: var(--color-midgray);
+      border-right-color: var(--color-midgray);
+    }
+    /* Table row-group elements */
+    x-component-status > details > div > table > :is(thead, tbody) > tr {
+      border-color: transparent;
+    }
+    /* All header cells */
+    x-component-status > details > div > table > thead {
+      color: var(--color-midgray);
+      border-color: var(--color-light);
+    }
+    /* Alternating component rows, overwriting with data-performance colour */
+    x-component-status > details > div > table > tbody:nth-of-type(odd) {
+      background-color: var(--data-performance-background-color, var(--alternate-component-background-color));
+    }
+    /* Alternating component rows, overwriting with data-performance colour */
+    x-component-status > details > div > table > tbody:nth-of-type(even) {
+      background-color: var(--data-performance-background-color);
+    }
+    /* ID column */
+    x-component-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(1) {
+      background-color: var(--data-live-background-color, transparent);
+      color: var(--data-live-color, var(--color-midgray));
+    }    
+  </style>
+  
+  <style> /** <x-market-status> *******************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA 
+    * 1. Markets with all data.
+    * DESCENDANT COMPONENTS
+    * 1. x-instrument-filter.
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) td[data-sign]
+    *    b) tbody[data-type]
+    *    c) tbody[data-exchange]
+    *    d) details[open]
+    *    e) details[data-x-filter-control-filtered]
+    * 2. Media-specific Size and Orientation Management 
+    * 3. Underlying UI Structure 
+    * 4. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    x-market-status {
+      /* Defaults for smaller screen sizes: market data is spread across two rows */
+      --header-first-row-padding-bottom: calc(var(--gap) / 4);
+      --header-first-row-padding-top: var(--gap);
+      --header-second-row-padding-bottom: var(--gap);
+      --header-second-row-padding-top: calc(var(--gap) / 4);
+      --last-cell-border-right-width: 0;
+      --market-cell-width: 23%;
+      --market-cell-height: calc(1rem * 1.625);
+      --market-cell-info-right-borders-radius: var(--border-radius);
+      --market-cell-info-right-border-width: var(--border-width);
+      --market-cell-padding-top: 0;
+      --market-cell-symbol-background-color: transparent;
+      --market-cell-symbol-border-width: 0;
+      --market-cell-symbol-color: var(--color-darkgray);
+      --market-cell-symbol-flex: 1 0 100%;
+      --market-cell-symbol-font-weight: bold;
+      --market-cell-symbol-line-height: auto;
+      --market-cell-symbol-order: 1;
+      --market-cell-symbol-padding-bottom: var(--border-width);
+      --market-cell-symbol-text-align: center;
+      --market-first-row-padding-bottom: 0;
+      --market-first-row-padding-top: var(--gap);
+      --market-second-row-padding-top: 0;
+      --market-second-row-padding-bottom: var(--gap);
+      --row-display: table-row;
+      /* Defaults for performance styling (neutral or 0 (zero) profit/loss) */
+      --market-performance-background-color: var(--color-lightgray);
+      --market-performance-color: var(--color-darkgray);
+      --market-performance-sign: "";
+      /* Other defaults */
+      --data-filter-display: none;
+    }
+    x-market-status > details > div > table > thead {
+      --row-group-display: table-header-group;
+    }
+    x-market-status > details > div > table > tbody {
+      --row-group-display: table-row-group;
+      --data-settings-instrument-display: var(--row-group-display);
+    }
+    x-market-status > details > div > table > tbody > tr > td[data-sign="+"] {
+      --market-performance-background-color: var(--color-blue);
+      --market-performance-color: var(--color-light);
+      --market-performance-sign: "+";
+    }
+    x-market-status > details > div > table > tbody > tr > td[data-sign="-"] {
+      --market-performance-background-color: var(--color-red);
+      --market-performance-color: var(--color-light);
+    }
+    x-market-status > details > div > table > tbody[data-type~="ETF"] {
+      --data-type-class: "E";
+    }
+    x-market-status > details > div > table > tbody[data-type~="Option"] {
+      --data-type-class: "O";
+    }
+    x-market-status > details > div > table > tbody[data-type~="-3x"] {
+      --data-type-subclass: "-3";
+    }
+    x-market-status > details > div > table > tbody[data-type~="-2x"] {
+      --data-type-subclass: "-2";
+    }
+    x-market-status > details > div > table > tbody[data-type~="-1x"] {
+      --data-type-subclass: "-1";
+    }
+    x-market-status > details > div > table > tbody[data-type~="+1x"] {
+      --data-type-subclass: "+1";
+    }
+    x-market-status > details > div > table > tbody[data-type~="+2x"] {
+      --data-type-subclass: "+2";
+    }
+    x-market-status > details > div > table > tbody[data-type~="+3x"] {
+      --data-type-subclass: "+3";
+    }
+    x-market-status > details > div > table > tbody[data-type~="Put"] {
+      --data-type-subclass: "P";
+    }
+    x-market-status > details > div > table > tbody[data-type~="Call"] {
+      --data-type-subclass: "C";
+    }
+    x-market-status > details > div > table > tbody[data-exchange] {
+      --data-exchange-icon: var(--icon-us);
+    }
+    x-market-status > details > div > table > tbody[data-exchange="xasx"] {
+      --data-exchange-icon: var(--icon-au);
+    }
+    x-market-status > details {
+      --details-marker-background-color: var(--color-lightgray);
+      --details-marker-margin-top: 0;
+      --details-marker-rotation: rotate(90deg);
+      --details-summary-background-color: var(--color-midgray);
+      --details-summary-color: var(--color-light);
+      --details-summary-border-bottom-left-radius: var(--border-radius);
+      --details-summary-border-bottom-right-radius: var(--border-radius);
+      --details-summary-icons-background-color: var(--color-lightgray);
+    }
+    x-market-status > details[open] {
+      --details-marker-background-color: var(--color-midgray);
+      --details-marker-margin-top: calc(var(--gap) / -2);
+      --details-marker-rotation: rotate(180deg);
+      --details-summary-background-color: var(--color-lightgray);
+      --details-summary-color: var(--color-darkgray);
+      --details-summary-border-bottom-left-radius: 0;
+      --details-summary-border-bottom-right-radius: 0;
+      --details-summary-icons-background-color: var(--color-midgray);
+    }
+    x-market-status[data-x-filter-control-filtered="active"] {
+      --icon-filter: var(--icon-filter-active);
+    }
+    x-market-status[data-x-filter-control-toggle="show"] {
+      --data-filter-display: flex;
+    }
+   /***** Media-specific Size and Orientation Management ******************************************/
+    @media only screen and (min-width: 667px) {
+      x-market-status {
+        --padding: calc(var(--gap) / 2);
+        /* Styling for larger screen sizes: market data is kept to a single row */
+        --header-first-row-padding-bottom: var(--padding);
+        --header-first-row-padding-top: var(--padding);
+        --header-second-row-padding-bottom: var(--padding);
+        --header-second-row-padding-top: var(--padding);
+        --market-cell-info-right-borders-radius: 0;
+        --market-cell-info-right-border-width: 0;
+        --market-cell-padding-top: var(--padding);
+        --market-cell-symbol-background-color: var(--color-midgray);
+        --market-cell-symbol-border-width: calc(var(--border-width) / 2);
+        --market-cell-symbol-color: var(--color-light);
+        --market-cell-symbol-flex: 1 0 auto;
+        --market-cell-symbol-font-weight: normal;
+        --market-cell-symbol-line-height: var(--market-cell-height);
+        --market-cell-symbol-order: 2;
+        --market-cell-symbol-padding-bottom: 0;
+        --market-cell-symbol-text-align: left;
+        --market-first-row-padding-bottom: var(--padding);
+        --market-first-row-padding-top: var(--padding);
+        --market-second-row-padding-top: 0;
+        --market-second-row-padding-bottom: 0;
+        --row-display: flex;
+      }
+      x-market-status > details > div > table > :is(thead, tbody) {
+        --row-group-display: flex;
+      }
+      x-market-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) {
+        --row-flex: 0 0 calc(100% / 12 * 7);
+        --first-row-cell-width: calc(100% / 7.6);
+      }
+      x-market-status > details > div > table > :is(thead, tbody) > tr:nth-last-of-type(1) {
+        --row-flex: 0 0 calc(100% / 12 * 5);
+      }
+      /* Market price action: Market, OHLC and Volume columns */
+      x-market-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) > :is(th, td) {
+        --cell-flex: 0 0 var(--first-row-cell-width);
+        order: 1;
+      }
+      /* Market price action: Market column */
+      x-market-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) > :is(th, td):nth-of-type(3) {
+        --market-cell-multiplier: 2.6;
+        --market-cell-width: calc(var(--first-row-cell-width) * var(--market-cell-multiplier));
+        --cell-flex: 0 0 calc(var(--first-row-cell-width) * var(--market-cell-multiplier));
+      }
+      /* Market price action: all % performance columns */
+      x-market-status > details > div > table > :is(thead, tbody) > tr:nth-last-of-type(1) > :is(th, td) {
+        --cell-flex: 0 0 calc(100% / 5);
+      }
+      /* Market price action: last(close) column */
+      x-market-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) > :is(th, td):nth-of-type(4) {
+        order: 1;
+      }
+      /* Market price action: Volume column */
+      x-market-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) > :is(th, td):nth-of-type(8) {
+        --last-cell-border-right-width: calc(var(--border-width) / 2);
+        order: 3;
+      }
+    }
+   /***** Underlying UI Structure *****************************************************************/
+    x-market-status {
+      --line-height: 1.2;
+      display: var(--data-settings-price-action-display);
+      line-height: var(--line-height);
+      margin: calc(var(--gap) * 3) 0;
+    }
+    /* Market price action: summary */
+    x-market-status > details > summary {
+      border-bottom-left-radius: var(--details-summary-border-bottom-left-radius);
+      border-bottom-right-radius: var(--details-summary-border-bottom-right-radius);
+      border-top-left-radius: var(--border-radius);
+      border-top-right-radius: var(--border-radius);
+      padding: calc(var(--gap) / 4);
+    }
+    /* Container to create a grid within the summary element */
+    x-market-status > details > summary > span  {
+      align-items: center;
+      cursor: inherit;
+      display: grid;
+      grid-template-columns: var(--icon-size) auto;
+      padding: calc(var(--gap) / 4);
+      gap: 0 calc(var(--gap) / 2);
+      text-align: left;
+    }
+    /* Container for custom marker for details[open] and close states */
+    x-market-status > details > summary > span > span:nth-of-type(1) {
+      grid-column: 1 / 2;
+    }
+    /* Custom marker for details[open] and close states */
+    x-market-status > details > summary > span > span:nth-of-type(1)::before {
+      content: ''; /* Closest character equivalent '\25B7'; */
+      display: block;
+      height: var(--icon-size);
+      margin-top: var(--details-marker-margin-top);
+      mask-image: var(--icon-triangle);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-image: var(--icon-triangle);
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      transform: var(--details-marker-rotation);
+      width: var(--icon-size);
+    }
+    /* Market price action: heading container */
+    x-market-status > details > summary > span > span:nth-of-type(2) {
+      display: flex;
+    }
+    /* Market price action: heading */
+    x-market-status > details > summary > span > span:nth-of-type(2) > h2 {
+      align-items: flex-start;
+      flex: 9999 9999 auto;
+      flex-direction: column;
+      font-size: 1.17rem;
+      font-weight: normal;
+      gap: calc(var(--gap) / 2) 0;
+      margin: 0;
+      padding-bottom: calc(var(--gap) / 4);
+    }
+    /* Market price action: heading text */
+    x-market-status > details > summary > span > span:nth-of-type(2) > h2 > span {
+      display: block;
+    }
+    /* Market price action: container for filter, user info icons and other stuff */
+    x-market-status > details > summary > span > span:nth-of-type(2) > span {
+      flex: 1 1 auto;
+      display: flex;
+      gap: 0 calc(var(--gap) / 2);
+    }
+    /* Market price action: container for filter and user-info icons */
+    x-market-status > details > summary > span > span:nth-of-type(2) > span > span {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      margin: 0 0 calc(var(--gap) / 4) 0;
+    }
+    /* Market price action: filter icon */
+    x-market-status > details > summary > span > span:nth-of-type(2) > span > span > input[type="checkbox"][name="data-x-filter-control-toggle"] {
+      height: 1.6em;
+      width: 1.6em;
+    }
+    /* Market price action: user-info icon */
+    x-market-status > details > summary > span > span:nth-of-type(2) > span > span > a[href^="#user-info"] {
+      height: 1.2em;
+      width: 1.2em;
+    }
+    /* Container for all markup that is revealed on details[open] */
+    x-market-status > details > div {
+      border-radius: 0 0 var(--border-radius) var(--border-radius);
+      border-style: solid;
+      border-width: var(--border-width);
+      overflow-y: hidden;
+      padding: 0 calc(var(--gap) / 2) 0 calc(var(--gap) / 2);
+    }
+    /* Market price action: market exchange and market type columns */
+    x-market-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(odd) > :is(td:nth-child(-n + 2), th:nth-child(-n + 2)) {
+      display: none;
+    }
+    /* Market price action: market last(close) column */
+    x-market-status > details > div > table > :is(thead, tbody) > tr:nth-of-type(1) > :is(th, td):nth-of-type(4) {
+      font-weight: bold;
+    }
+    /* Market price action: container for header and each market */
+    x-market-status > details > div > table > :is(thead, tbody) {
+      display: var(--row-group-display);
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    /* Market price action: table header */
+    x-market-status > details > div > table > thead {
+      border-bottom-style: groove;
+      border-bottom-width: calc(var(--border-width) * 4);
+    }
+    /* Market price action: container for a market */
+    x-market-status > details > div > table > tbody {
+      display: var(--data-settings-instrument-display);
+    }
+    /* Market price action: each of the two rows for the header and for a market */
+    x-market-status > details > div > table > :is(thead, tbody) > tr {
+      align-items: center;
+      display: var(--row-display);
+      flex: var(--row-flex);
+    }
+    /* Market price action: each of the two rows for each market */
+    x-market-status > details > div > table > tbody > tr {
+      border-style: solid;
+      border-width: var(--border-width) 0;
+    }
+    /* Market price action: table header first row */
+    x-market-status > details > div > table > thead > tr:nth-of-type(1) > th {
+      padding-bottom: var(--header-first-row-padding-bottom);
+      padding-top: var(--header-first-row-padding-top);
+    }
+    /* Market price action: table header second row */
+    x-market-status > details > div > table > thead > tr:nth-last-of-type(1) > th {
+      padding-bottom: var(--header-second-row-padding-bottom);
+      padding-top: var(--header-second-row-padding-top);
+    }
+    /* Market price action: all cells of header and each market */
+    x-market-status > details > div > table > :is(thead, tbody) > tr > :is(th, td) {
+      border: 0;
+      border-style: dotted;
+      border-right-width: calc(var(--border-width) / 2);      
+      font-weight: normal;
+      font-size: 0.9rem;
+      flex: var(--cell-flex);
+      padding: 0 calc(var(--gap) / 4);
+    }
+    /* Market price action: last cell of header and each market */
+    x-market-status > details > div > table > :is(thead, tbody) > tr > :is(th, td):nth-last-of-type(1) {
+      border-right-width: var(--last-cell-border-right-width);
+    }
+    /* Market price action: market, OHLC and volume data of a market */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td {
+      padding-top: var(--market-first-row-padding-top);
+      padding-bottom: var(--market-first-row-padding-bottom);
+    }
+    /* Market price action: % performance columns for a market */
+    x-market-status > details > div > table > tbody > tr:nth-last-of-type(1) > td {
+      padding-top: var(--market-second-row-padding-top);
+      padding-bottom: var(--market-second-row-padding-bottom);
+    }
+    /* Market price action: % performance text for a market */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(2) > td > span {
+      border-style: solid;
+      border-width: var(--border-width) 0;
+      border-radius: var(--border-radius);
+      display: inline-block;
+      padding: calc(var(--gap) / 2) 0;
+      width: 100%;
+    }
+    x-market-status > details > div > table > tbody > tr > td > span:before {
+      content: var(--market-performance-sign);
+    }
+    /* Market price action: market column */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) {
+      padding-top: var(--market-cell-padding-top);
+      width: var(--market-cell-width);
+    }
+    /* Market price action: market column, exchange, type, info container*/
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    /* Market price action: market column, children */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span {
+      border-style: solid;
+      border-width: calc(var(--border-width) / 2);
+      flex: 0 0 auto;
+      height: var(--market-cell-height);
+      order: 2;
+    }
+    /* Market price action: market column, instrument exchange box */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(1) {
+      background-image:var(--data-exchange-icon);
+      background-repeat: no-repeat;
+      background-position: -2px -1px;
+      border-bottom-left-radius: calc(var(--border-radius) * 1.5);
+      border-top-left-radius: calc(var(--border-radius) * 1.5);
+      border-right: 0;
+      padding-left: var(--gap);
+      padding-right: calc(var(--gap) * 1.4);
+    }
+    /* Market price action: market column, instrument type box */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(2) {
+      background-position: -3px -3px;
+      background-repeat: no-repeat;
+      background-size: 30px 30px;
+      border-left: 0;
+      border-right: 0;
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: calc(var(--letter-spacing) * 10);
+      position: relative;
+      width: 27px;
+    }
+    /* Market price action: market column, instrument type subclass ('numerator') */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(2)::before {
+      content: var(--data-type-subclass);
+      display: block;
+      left: 0px;
+      position: absolute;
+      top: 0px;
+      text-align: center;
+      width: 60%;
+    }
+    /* Market price action: market column, instrument type class ('denominator') */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(2)::after {
+      bottom: 0px;
+      content: var(--data-type-class);
+      display: block;
+      position: absolute;
+      right: 0px;
+      text-align: center;
+      width: 60%;
+    }
+    /* Market price action: instrument info icon box */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(3) {
+      align-items: center;
+      border-top-right-radius: var(--market-cell-info-right-borders-radius);
+      border-bottom-right-radius: var(--market-cell-info-right-borders-radius);
+      border-left-width: 0;
+      border-right-width: var(--market-cell-info-right-border-width);
+      display: flex;
+      margin-left: calc(var(--gap) / -2);
+    }
+    /* Market price action: instrument info icon */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(3) > a {
+      height: 1.1em;
+      width: 1.1em;
+    }
+    /* Market price action: symbol text */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(4) {
+      border: 0;
+      border-top-right-radius: var(--border-radius);
+      border-bottom-right-radius: var(--border-radius);
+      flex: var(--market-cell-symbol-flex);
+      font-weight: var(--market-cell-symbol-font-weight);
+      height: var(--market-cell-symbol-line-height);
+      line-height: var(--market-cell-symbol-line-height);
+      min-width: 6.75ch;
+      order: var(--market-cell-symbol-order);
+      padding-bottom: var(--market-cell-symbol-padding-bottom);
+      text-align: var(--market-cell-symbol-text-align);
+    }
+    /* Market price action: table footer */
+    x-market-status > details > div > table > tfoot >tr > td {
+      border-radius: 0 0 var(--border-radius) var(--border-radius);
+      border: 0;
+      font-size: 0.25rem;
+      padding: 0;
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    /* Market price action: heading */
+    x-market-status > details > summary {
+      background-color: var(--details-summary-background-color);
+      color: var(--details-summary-color);
+    }
+    /* Custom marker for details[open] and close states */
+    x-market-status > details > summary > span > span:nth-of-type(1)::before {
+      background-color: var(--details-marker-background-color);
+    }
+    /* Market price action: filter and user-info icons */
+    x-market-status > details > summary > span > span:nth-of-type(2) > span > span > a[href^="#user-info"], 
+    x-market-status > details > summary > span > span:nth-of-type(2) > span > span > input[type="checkbox"][name="data-x-filter-control-toggle"] {
+      background-color: var(--details-summary-icons-background-color);
+    }
+    /* Container for all markup that is revealed on details[open] */
+    x-market-status > details > div {
+      background-color: var(--color-light);
+      border-color: var(--color-lightgray);
+    }
+    /* Market price action: header */
+    x-market-status > details > div > table > thead {
+      background-color: transparent;
+      border-color: var(--color-light);
+    }
+    /* Market price action: all header cells */
+    x-market-status > details > div > table > thead > tr > th {
+      border-color: var(--color-lightgray);
+      color: var(--color-midgray);
+    }
+    /* Market price action: each of the two rows for a market */
+    x-market-status > details > div > table > tbody > tr {
+      border-color: transparent;
+    }
+    /* Market price action: all cells in each market */
+    x-market-status > details > div > table > tbody > tr > td {
+      border-color: var(--color-midgray);
+      color: var(--color-darkgray);
+    }
+    /* Market price action: alternating markets */
+    x-market-status > details > div > table > tbody:nth-of-type(even) {
+      background-color: var(--color-light);
+    }
+    /* Market price action: alternating markets */
+    x-market-status > details > div > table > tbody:nth-of-type(odd) {
+      background-color: var(--color-fadedlightgray);
+    }
+    /* Market price action: text in % performance columns */
+    x-market-status > details > div > table > tbody > tr > td > span {
+      border-color: var(--market-performance-background-color);
+      background-color: var(--market-performance-background-color);
+      color: var(--market-performance-color);
+    }
+    /* Market price action: instrument exchange icon box */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(1) {
+      background-color: var(--color-light);
+    }
+    /* Market price action: instrument type box */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(2) {
+      background-color: var(--color-lightgray);
+      background-image: linear-gradient(-45deg, var(--color-midgray) 50%, var(--color-light) 50%);
+    }
+    /* Market price action: instrument type class ('denominator' in instrument type box) */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(2)::after {
+      color: var(--color-lightgray);
+    }
+    /* Market price action: instrument info icon box */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(3) {
+      background-color: var(--color-midgray);
+      border-color: var(--color-midgray);
+    }
+    /* Market price action: instrument info icon */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(3) > a {
+      background-color: var(--color-lightgray);
+    }
+    /* Market price action: instrument symbol */
+    x-market-status > details > div > table > tbody > tr:nth-of-type(1) > td:nth-of-type(3) > div > span:nth-of-type(4) {
+      background-color: var(--market-cell-symbol-background-color);
+      color: var(--market-cell-symbol-color);
+    }
+    /* Market price action: table footer */
+    x-market-status > details > div > table > tfoot >tr > td {
+      background-color: transparent;
+    }
+  </style>
+
+  <style> /** <x-filter> **************************************************************************/
+   /***** DEPENDENCIES *****************************************************************************
+    * DATA 
+    * 1. Markets with all data.
+    * DESCENDANT COMPONENTS
+    *    None.
+    */
+   /***** TOC **************************************************************************************
+    * 1. UI State Management
+    *    a) x-component[data-x-filter]. The CSS rules are less specific so that they can be applied 
+    *       to x-components with different DOM structures 
+    * 2. Underlying UI Structure 
+    * 3. Underlying UI Colour Scheme Themeing
+    */
+   /***** UI State Management *********************************************************************/
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-exchanges~="AU"]) [data-exchange="xasx"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-exchanges~="US"]) :is(
+      [data-exchange="arca"], 
+      [data-exchange="xnas"], 
+      [data-exchange="bats"], 
+      [data-exchange="opra"]) {
+      --data-settings-instrument-display: none;
+    }
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-marketgroups~="S&P500"]) [data-marketgroup="S&P500"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-marketgroups~="NASDAQ100"]) [data-marketgroup="NASDAQ100"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-marketgroups~="Russell2000"]) [data-marketgroup="Russell2000"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-marketgroups~="Volatility"]) [data-marketgroup="Volatility"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-marketgroups~="Silver"]) [data-marketgroup="Silver"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-marketgroups~="Oil"]) [data-marketgroup="Oil"] {
+      --data-settings-instrument-display: none;
+    }
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-etftypes~="direct"]) [data-correlation="direct"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-etftypes~="inverse"]) [data-correlation="inverse"] {
+      --data-settings-instrument-display: none;
+    }
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-etftypes~="0.5x"]) [data-leverage="0.5x"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-etftypes~="1x"]) [data-leverage="1x"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-etftypes~="2x"]) [data-leverage="2x"],
+    :is(x-user-menu, x-position-status, x-market-status):not([data-x-filter-etftypes~="3x"]) [data-leverage="3x"] {
+      --data-settings-instrument-display: none;
+    }
+   /***** Underlying UI Structure *****************************************************************/
+    x-filter {
+      display: var(--data-filter-display);
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: var(--gap) 0;
+      /* gap: calc(var(--gap) / 2) 0; */
+    }
+    x-filter > fieldset {
+      align-items: flex-start;
+      border-radius: var(--border-radius);
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      flex-wrap: wrap;
+    }
+    /* Filter fieldset checkbox containers */
+    x-filter > fieldset > label {
+      min-width: 14ch;
+    }
+    /* Filter fieldset checkboxes */
+    x-filter > fieldset > label > input[type="checkbox"] {
+      height: 1rem;
+      margin-right: 0;
+      min-height: 1rem;
+      min-width: 1rem;
+      width: 1rem;
+    }
+    /* Filter fieldset buttons container */
+    x-filter > fieldset > div > label > input[type="button"] {
+      margin: calc(var(--gap) / 2) 0 0 calc(var(--gap) / 4);
+    }
+    /* Filter fieldset buttons */
+    x-filter > fieldset > div > label > input[type="button"] {
+      border-radius: var(--border-radius);
+      border-style: outset;
+      border-width: var(--border-width);
+      font-size: 0.8rem;
+      font-weight: normal;
+    }
+   /***** Underlying UI Colour Scheme Theming *****************************************************/
+    x-filter {
+      color: var(--color-midgray);
+    }
+  </style>
+
+</head>
+
+<body data-settings-strategy-types="simple compound" data-settings-user-info="true" data-settings-price-action="true" data-settings-component-maps="true" id="help">
+
+  <header>
+    <x-page-header>
+      <a href="/">
+        <img src="../img/artificial-intelligence-144-278132.png"/>
+        <span>AI Investing</span>
+      </a>
+      <h1>
+        <span>Status at US market close on</span>
+        <time datetime="Mon, 06-Sep-2021">Mon, 06-Sep-2021</time>
+      </h1>
+      <details>
+        <summary></summary>
+        <div>
+          <x-user-menu data-user-level="advanced" data-x-filter-control-sync="true" data-x-filter-exchanges="AU US">
+            <div>
+              <fieldset data-exchange="US">
+                <legend>US markets</legend>
+                <dl>
+                  <div>
+                    <dt>NYSE trading days</dt>
+                    <dd><span>Last</span><time>Fri, 03-Sep-2021</time></dd>
+                    <dd><span>Next</span><time>Tue, 07-Sep-2021</time></dd>
+                    <dd>Markets are closed on Mon, 06-Sep-2021 for 'Labor Day' holiday.</dd>
+                  </div>
+                  <div>
+                    <dt><a href="https://www.nyse.com/markets/hours-calendars">NYSE session hours</a></dt>
+                    <dd><span>Open</span><time>11:30pm <abbr title="Austrlian Eastern Standard Time">AEST</abbr></time></dd>
+                    <dd><span>Close</span><time>06:00am <abbr title="Austrlian Eastern Standard Time">AEST</abbr></time></dd>
+                  </div>
+                </dl>
+              </fieldset>
+              <fieldset data-exchange="AU">
+                <legend>AU markets</legend>
+                <dl>
+                  <div>
+                    <dt>ASX trading days</dt>
+                    <dd><span>Last</span><time>Fri, 03-Sep-2021</time></dd>
+                    <dd><span>Next</span><time>Tue, 07-Sep-2021</time></dd>
+                  </div>
+                  <div>
+                    <dt><a href="https://www.nyse.com/markets/hours-calendars">ASX session hours</a></dt>
+                    <dd><span>Open</span><time>09:30am <abbr title="Austrlian Eastern Standard Time">AEST</abbr></time></dd>
+                    <dd><span>Close</span><time>04:00pm <abbr title="Austrlian Eastern Standard Time">AEST</abbr></time></dd>
+                  </div>
+                </dl>
+              </fieldset>
+            </div>
+            <div>
+              <fieldset data-settings-type="General settings">
+                <legend>Settings</legend>
+                <label>
+                  <select>
+                    <option value="20210909" selectd>Thu, 09-Sep-2021</option>
+                    <option value="20210908">Wed, 08-Sep-2021</option>
+                    <option value="20210907">Tue, 07-Sep-2021</option>
+                    <option value="20210903">Fri, 03-Sep-2021</option>
+                    <option value="20210902">Thu, 02-Sep-2021</option>
+                    <option value="20210901">Wed, 01-Sep-2021</option>
+                  </select>
+                  <dl>
+                    <dt>Show trading day</dt>
+                    <dd>Detault is most recent closed day of US markets. Selecting a different day will update the site.</dd>
+                  </dl>
+                </label>
+                <label>
+                  <input type="checkbox" name="data-settings-user-info" value="true" checked>
+                  <dl>
+                    <dt>Show user info icons</dt>
+                    <dd>Clicking/tapping on an info icon (<a href="#user-info-about" class="invert"></a>) reveals more detailed contextual information.</dd>
+                  </dl>
+                </label>
+                <label>
+                  <input type="checkbox" name="data-settings-price-action" value="true" checked>
+                  <dl>
+                    <dt>Show price action</dt>
+                    <dd>The day's price action of the markets associated with your subscribed strategies will be shown.</dd>
+                  </dl>
+                </label>
+                <label data-level="advanced">
+                  <input type="checkbox" name="data-settings-strategy-types" value="compound" checked>
+                  <span>Show compound strategies</span>
+                </label>
+                <label data-level="advanced">
+                  <input type="checkbox" name="data-settings-strategy-types" value="simple" checked>
+                  <span>Show simple strategies</span>
+                </label>
+                <label data-level="advanced">
+                  <input type="checkbox" name="data-settings-component-maps" value="true" checked>
+                  <span>Show strategy component maps</span>
+                </label>
+              </fieldset>
+              <fieldset data-settings-type="Instrument filters">
+                <legend>Filters</legend>
+                <span>These settings are applied to all strategies and are synchronised with the filters in the Market price action section.</span>
+                <x-filter>
+                  <fieldset>
+                    <legend>Exchanges</legend>
+                    <label>
+                      <input type="checkbox" name="data-x-filter-exchanges" value="US" checked>
+                      <span>US</span>
+                    </label>
+                    <label>
+                      <input type="checkbox" name="data-x-filter-exchanges" value="AU" checked>
+                      <span>AU</span>
+                    </label>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Options</legend>
+                    <label>
+                      <input type="checkbox" name="data-x-filter-control-sync"  value="true">
+                      <span>Sync other filters</span>
+                    </label>            
+                  </fieldset>
+                </x-filter>
+              </fieldset>
+              <fieldset>
+                <legend>Your subscribed strategies</legend>
+                <p>Click/tap on a strategy to view its fact sheet.</p>
+                <nav>
+                  <ul>
+                    <li><a href="">US Equities Investor</a></li>
+                    <li><a href="">US Speculative Trader</a></li>
+                  </ul>
+                </nav>
+              </fieldset>
+              <fieldset>
+                <legend>Profile</legend>
+                <p>You are signed in as <b>Joe Bloggs</b> and are subscribed to the strategies listed in the previous section.</p>
+                <p>If others use this device you may wish to keep this site private by signing out. To sign back in again, follow a link from within an email you have received from AI Investing.</p>
+                <button type="button">Sign out</button>
+              </fieldset>
+            </div>
+          </x-user-menu>
+        </div>
+      </details>
+    </x-page-header>
+    <x-user-info>
+      <div id="user-info-about">
+        <div><span></span></div>
+        <div>
+          <p>
+            More contextual information here
+          </p>
+        </div>
+        <a href="#"></a>
+      </div>
+      <div id="user-info-strategy-status">
+        <div><span></span></div>
+        <div>
+          <p>
+            The boxed area around the info icon you just clicked on shows the current status of the strategy at the close of the trading day shown at the top of the screen. Click on the triangle to the left to get more details about the strategy. Click on the envelope icon to see the message that was sent in the email you received. 
+          </p>
+        </div>
+        <a href="#"></a>
+      </div>
+      <div id="user-info-position-status">
+        <div><span></span></div>
+        <div>
+          <p>
+            1 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dicta velit commodi amet consequatur id fuga sequi autem ab corporis minima vel incidunt recusandae odit, rerum quia, repellendus et optio perferendis!
+          </p>
+        </div>
+        <a href="#"></a>
+      </div>
+      <div id="user-info-component-map">
+        <div><span></span></div>
+        <div>
+          <p>
+            2 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dicta velit commodi amet consequatur id fuga sequi autem ab corporis minima vel incidunt recusandae odit, rerum quia, repellendus et optio perferendis!
+          </p>
+        </div>
+        <a href="#"></a>
+      </div>
+      <div id="user-info-mail-m-NDX-SPX">
+        <div><span></span></div>
+        <div>
+          <p>Message for <b>US Equities Investor</b> in email sent on Mon 06-Sep-2021: <q>Switch: Exit existing bearish position on NASDAQ100 Index, at limit of +0.85%, on Tue, 07-Sep-2021; Enter new bullish position on S&P500 Index at limit of +0.45%, on Tue, 07-Sep-2021</q></p>
+        </div>
+        <a href="#"></a>
+      </div>
+      <div id="user-info-xasx-bbus">
+        <div><span></span></div>
+        <div>
+          <p>BBUS is a 2x inverse geared ETF on the Australian stock exchange. <a href="https://www.betashares.com.au/fund/us-equities-strong-bear-fund">Learn more</a></p>
+        </div>
+        <a href="#"></a>
+      </div>
+      <div id="user-info-limit-calculations">
+        <div><span></span></div>
+        <div>
+          <p>The limit is calculated against the underlying market. The AI gives an <i>absolute</i> limit for the underlying market, so a percentage of that absolute limit is calculated. The percentage can then be applied to different instruments to determine the absolute limit for them. Note that leverage is taken into account.</p>
+        </div>
+        <a href="#"></a>
+      </div>
+      <div id="user-info-market-action-filter">
+        <div><span></span></div>
+        <div>
+          <p>Market action filter user info.</p>
+        </div>
+        <a href="#"></a>
+      </div>
+    </x-user-info>
+  </header>
+  <hr data-component="x-trade-alert" data-actions="enter"/>
+
+  <aside>
+    <x-user-unauthorised>
+    </x-user-unauthorised>
+    <x-user-welcome>
+    </x-user-welcome>
+  </aside>
+  
+  <main>
+    <x-trade-alert data-actions="enter">
+      <p>
+        <span><span></span></span>
+        <span>
+          <span>New trades next session </span>
+          <time datetime="Tue, 07-Sep-2021">(Tue, 07-Sep-2021)</time>
+        </span>
+      </p>
+    </x-trade-alert>
+    <section>
+      <h2>Stategy statuses</h2>
+      <x-strategy-status data-id="[Live] m-NDX-SPX" data-action="switch" data-performance="+" data-strategy-type="compound">
+        <details open>
+          <summary>
+            <span>
+              <span data-marker></span>
+              <span>
+                <h3>
+                  <span>US Equities Investor</span>
+                </h3>
+                <span>
+                  <span>
+                    <a href="#user-info-mail-m-NDX-SPX"></a>
+                    <a href="#user-info-strategy-status"></a>
+                  </span>
+                  <strong>
+                    <span data-action></span>
+                    <span data-action></span>
+                  </strong>
+                  <strong>
+                    <span>
+                      <span>QQQ</span>
+                      <span data-performance>16.07</span>
+                    </span>
+                    <span>
+                      <span>28-Aug</span>
+                      <span>248</span>
+                    </span>
+                  </strong>
+                </span>
+              </span>
+            </span>
+          </summary>
+          <div>
+            <x-position-status data-action="exit" data-sentiment="bearish" data-limit="+">
+              <details>
+                <summary>
+                  <span>
+                    <span data-marker></span>
+                    <h4>
+                      <strong>
+                        <span></span>
+                        <time datetime="Wed, 07-Sep-2021">Wed, 07-Sep-2021</time>
+                      </strong>
+                      <span data-sentiment></span>
+                      <span>NASDAQ100 Index</span>
+                      <span data-limit>0.40</span>
+                      <!-- <span>existing bearish position on NASDAQ100 Index @ +0.40% limit</span> -->
+                      <a href="#user-info-position-status"></a>
+                    </h4>
+                  </span>
+                </summary>
+                <div>
+                  <x-instrument-status data-action="sell">
+                    <table>
+                      <caption>Instrument data</caption>
+                      <thead>
+                        <tr>
+                          <th rowspan="2">Xch</th>
+                          <th rowspan="2">Type</th>
+                          <th rowspan="2">i</th>
+                          <th rowspan="2">Symbol</th>
+                          <th>Action</th>
+                          <th>Price</th>
+                          <th></th>
+                          <th></th>
+                        </tr>
+                        <tr>
+                          <th>Limit</th>
+                          <th>Last</th>
+                          <th>i</th>
+                          <th>Perf</th>
+                        </tr>
+                      </thead>
+                      <tbody data-performance="+" data-limit="+" data-exchange="xasx" data-type="-3x ETF">
+                        <tr>
+                          <td rowspan="2" data-exchange>&nbsp;</td>
+                          <td rowspan="2" data-type></td>
+                          <td rowspan="2"><a href="#user-info-xasx-bbus"></a></td>
+                          <td rowspan="2">BBUS</td>
+                          <td data-action></td>
+                          <td colspan="3">25.49</td>
+                        </tr>
+                        <tr>
+                          <td data-limit>0.80</td>
+                          <td>24.70</td>
+                          <td><a href="#user-info-xasx-bbus"></a></td>
+                          <td data-performance>222.14</td>
+                        </tr>
+                      </tbody>
+                      <tbody data-performance="-" data-exchange="opra" data-type="Call Option">
+                        <tr>
+                          <td rowspan="2" data-exchange>&nbsp;</td>
+                          <td rowspan="2" data-type></td>
+                          <td rowspan="2"><a href="#user-info-arca-sh"></a></td>
+                          <td rowspan="2">SH</td>
+                          <td data-action></td>
+                          <td colspan="3">25.49</td>
+                        </tr>
+                        <tr>
+                          <td data-limit></td>
+                          <td>25.49</td>
+                          <td><a href="#user-info-xasx-bbus"></a></td>
+                          <td data-performance>222.14</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </x-instrument-status>
+                </div>
+              </details>
+            </x-position-status>
+            <x-position-status data-action="enter" data-sentiment="bullish" data-limit="+">
+              <details>
+                <summary>
+                  <span>
+                    <span></span>
+                    <h4>
+                      <strong>
+                        <span></span>
+                        <time datetime="Tue, 07-Sep-2021">Tue, 07-Sep-2021</time>
+                      </strong>
+                      <span data-sentiment></span>
+                      <span>S&P500 Index</span>
+                      <span data-limit>0.85</span>
+                      <!-- <span>new bullish position on NASDAQ100 Index +0.85% limit</span> -->
+                      <a href="#user-info-position-status"></a>
+                    </h4>
+                  </span>
+                </summary>
+                <div>
+                  <x-instrument-status>
+                    <table>
+                      <caption>Instrument data</caption>
+                      <thead>
+                        <tr>
+                          <th>Type</th>
+                          <th>Exchange</th>
+                          <th>Action</th>
+                          <th>Symbol @ price</th>
+                          <th>Calculation</th>
+                          <th>Performance</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>-2x ETF</td>
+                          <td>AU</td>
+                          <td>SELL</td>
+                          <td>BBUS @ 25.49</td>
+                          <td>0.80% on last 24.70</td>
+                          <td>+8.14%</td>
+                        </tr>
+                        <tr>
+                          <td>-1x EFT</td>
+                          <td>US</td>
+                          <td>SELL</td>
+                          <td>SH @ 33.09</td>
+                          <td>0.40% on last 32.60</td>
+                          <td>+4.10%</td>
+                        </tr>
+                        <tr>
+                          <td>-2x ETF</td>
+                          <td>US</td>
+                          <td>SELL</td>
+                          <td>SSO @ 72.13</td>
+                          <td>0.80% on last 71.34</td>
+                          <td>+8.02%</td>
+                        </tr>
+                        <tr>
+                          <td>-3x ETF</td>
+                          <td>US</td>
+                          <td>SELL</td>
+                          <td>SPXU @ 41.14</td>
+                          <td>1.20% on last 40.33</td>
+                          <td>+12.43%</td>
+                        </tr>
+                        <tr>
+                          <td>Put Option</td>
+                          <td>US</td>
+                          <td>SELL</td>
+                          <td>SPY/17Z21P348 @ 37.49</td>
+                          <td>2.45% on last 35.98</td>
+                          <td>+29.77%</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </x-instrument-status>
+                </div>
+              </details>              
+            </x-position-status>
+            <x-component-status data-instrument-filter="true">
+              <details open>
+                <summary>
+                  <span>
+                    <span data-marker></span>
+                    <span>
+                      <h4>
+                        <span>
+                          <span>SPY:</span>
+                          <span>S2b-S3bcdeabhi-L2-L3bd</span>
+                        </span>
+                        <span>
+                          <span>VIXY:</span>
+                          <span>L2abcd-L1-S2a</span>
+                        </span>    
+                      </h4>
+                      <span>
+                        <span>
+                          <a href="#user-info-component-map"></a>
+                        </span>
+                        <strong>
+                          <span>SPY</span>
+                          <span>
+                            <span>S:1</span>
+                            <span>L:0</span>
+                          </span>
+                        </strong>
+                        <strong>
+                          <span>VIXY</span>
+                          <span>
+                            <span>S:1</span>
+                            <span>L:0</span>
+                          </span>
+                        </strong>
+                      </span>
+                    </span>
+                  </span>
+                </summary>
+                <div>
+                  <table>
+                    <caption>
+                      <span>
+                        <span>SPY:</span>
+                        <span>S2b-S3bcdeabhi-L2-L3bd</span>
+                      </span>
+                      <span>
+                        <span>VIXY:</span>
+                        <span>L2abcd-L1-S2a</span>
+                      </span>    
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th rowspan="2"><abbr title="Component ID">ID</abbr></th>
+                        <th rowspan="2">
+                          <span>Action</span>
+                          <span>Limit</span>
+                        </th>
+                        <th rowspan="2"><abbr title="Total Positions">TP</abbr></th>
+                        <th rowspan="2"><abbr title="Positions per year">P/yr</abbr></th>
+                        <th><abbr title="% Win/loss">WL%</abbr></th>
+                        <th><abbr title="Average position duration">APD</abbr></th>
+                        <th><abbr title="% Average position gain">APG%</abbr></th>
+                      </tr>
+                      <tr>
+                        <th><abbr title="Entry Date">Entry</abbr></th>
+                        <th><abbr title="Duration">Days</abbr></th>
+                        <th><abbr title="% Gain">Gain%</abbr></th>
+                      </tr>
+                    </thead>
+                    <tbody data-action="hold" data-performance="+">
+                      <tr>
+                        <td rowspan="2">c-VIXY-S2b</td>
+                        <td rowspan="2">
+                          <span data-action></span>
+                          <span data-limit></span>
+                        </td>
+                        <td rowspan="2">12</td>
+                        <td rowspan="2">0.6</td>
+                        <td>91</td>
+                        <td>21</td>
+                        <td>4.9</td>
+                      </tr>
+                      <tr>
+                        <td>23-Jul</td>
+                        <td>16</td>
+                        <td data-performance>3.9</td>
+                      </tr>
+                    </tbody>
+                    <tbody data-action="idle">
+                      <tr>
+                        <td rowspan="2">c-SPY-S2b</td>
+                        <td rowspan="2">
+                          <span data-action>&nbsp;</span>
+                          <span data-limit>&nbsp;</span>
+                        </td>
+                        <td rowspan="2">12</td>
+                        <td rowspan="2">0.6</td>
+                        <td>91</td>
+                        <td>21</td>
+                        <td>4.9</td>
+                      </tr>
+                    </tbody>
+                    <tbody data-action="exit" data-performance="-" data-limit="+" data-live="true">
+                      <tr>
+                        <td rowspan="2">c-SPY-S2b</td>
+                        <td rowspan="2">
+                          <span data-action></span>
+                          <span data-limit>0.76</span>
+                        </td>
+                        <td rowspan="2">12</td>
+                        <td rowspan="2">0.6</td>
+                        <td>91</td>
+                        <td>21</td>
+                        <td>4.9</td>
+                      </tr>
+                      <tr>
+                        <td>23-Jul</td>
+                        <td>16</td>
+                        <td data-performance>3.9</td>
+                      </tr>
+                    </tbody>
+                    <tbody data-action="enter" data-limit="-">
+                      <tr>
+                        <td rowspan="2">c-SPY-S2b</td>
+                        <td rowspan="2">
+                          <span data-action></span>
+                          <span data-limit>2.97</span>  
+                        </td>
+                        <td rowspan="2">12</td>
+                        <td rowspan="2">0.6</td>
+                        <td>91</td>
+                        <td>21</td>
+                        <td>4.9</td>
+                      </tr>
+                    </tbody>
+                    <tbody data-action="enter" data-limit="-">
+                      <tr>
+                        <td rowspan="2">c-SPY-S2b</td>
+                        <td rowspan="2">
+                          <span data-action></span>
+                          <span data-limit>2.97</span>  
+                        </td>
+                        <td rowspan="2">12</td>
+                        <td rowspan="2">0.6</td>
+                        <td>91</td>
+                        <td>21</td>
+                        <td>4.9</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            </x-component-status>
+          </div>
+        </details>
+      </x-strategy-status>
+      <x-strategy-status data-id="[Live] m-SPXo-VIXY" data-action="idle" data-strategy-type="simple">
+        <details>
+          <summary>
+            <span>
+              <span></span>
+              <span>
+                <h3>
+                  <span>US LargeCap-Volatility Ultra Pro Extreme</span>
+                </h3>
+                <span>
+                  <span>
+                    <a href="#user-info-mail-m-SPXo-VIXY"></a>
+                    <a href="#user-info-strategy-status"></a>
+                  </span>
+                  <strong>
+                    <span></span>
+                    <span data-css-binding="x-strategy-status[data-action]"></span>
+                  </strong>
+                  <strong>
+                    <span>
+                      <span></span>
+                      <span>&mdash;</span>
+                    </span>
+                    <span>
+                      <span></span>
+                      <span>&mdash;</span>
+                    </span>
+                  </strong>
+                </span>
+              </span>
+            </span>
+          </summary>
+          <div></div>
+        </details>
+      </x-strategy-status>
+    </section>
+    <section>
+      <x-market-status>
+        <details>
+          <summary>
+            <span>
+              <span data-marker></span>
+              <span>
+                <h2>
+                  <span>Market price action on</span>
+                  <time datetime="Mon, 06-Sep-2021">Mon, 06-Sep-2021</time>
+                </h2>
+                <span>
+                  <span>
+                    <input type="checkbox" name="data-x-filter-control-toggle" value="show" checked>
+                    <a href="#user-info-market-action-filter"></a>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </summary>
+          <div>
+            <x-filter>
+              <fieldset>
+                <legend>Market groups</legend>
+                <label>
+                  <input type="checkbox" name="data-x-filter-marketgroups" value="S&P500" checked>
+                  <span>S&P500</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-marketgroups" value="NASDAQ100" checked>
+                  <span>NASDAQ100</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-marketgroups" value="Russell2000" checked>
+                  <span>Russell2000</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-marketgroups" value="Volatility" checked>
+                  <span>Volatility</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-marketgroups" value="Silver" checked>
+                  <span>Silver</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-marketgroups" value="Oil" checked>
+                  <span>Oil</span>
+                </label>            
+              </fieldset>
+              <fieldset>
+                <legend>ETF Types</legend>
+                <label>
+                  <input type="checkbox" name="data-x-filter-etftypes" value="direct" checked>
+                  <span>Direct</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-etftypes" value="inverse" checked>
+                  <span>Inverse</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-etftypes" value="0.5x" checked>
+                  <span>0.5x</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-etftypes" value="1x" checked>
+                  <span>1x</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-etftypes" value="2x" checked>
+                  <span>2x</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-etftypes" value="3x" checked>
+                  <span>3x</span>
+                </label>            
+              </fieldset>
+              <fieldset>
+                <legend>Exchanges</legend>
+                <label>
+                  <input type="checkbox" name="data-x-filter-exchanges" value="US">
+                  <span>US</span>
+                </label>            
+                <label>
+                  <input type="checkbox" name="data-x-filter-exchanges" value="AU">
+                  <span>AU</span>
+                </label>            
+              </fieldset>
+              <fieldset>
+                <legend>Options</legend>
+                <label>
+                  <input type="checkbox" name="data-x-filter-control-sync" value="true">
+                  <span>Sync other filters</span>
+                </label>            
+                <div>
+                  <label>
+                    <input type="button" value="Select all" name="data-x-filter-control-select-all">
+                  </label>
+                  <label>
+                    <input type="button" value="Clear" name="data-x-filter-control-clear-all">
+                  </label>
+                </div>
+              </fieldset>
+            </x-filter>
+            <table>
+              <caption>
+              </caption>
+              <thead>
+                <tr>
+                  <th rowspan="2">Exchange</th>
+                  <th rowspan="2">Type</th>
+                  <th rowspan="2">Market</th>
+                  <th>Last</th>
+                  <th>Open</th>
+                  <th>High</th>
+                  <th>Low</th>
+                  <th>Vol</th>
+                </tr>
+                <tr>
+                  <th>% Day</th>
+                  <th>% Wk</th>
+                  <th>% Mth</th>
+                  <th>% Qtr</th>
+                  <th>% Yr</th>
+                </tr>
+              </thead>
+              <tbody data-exchange="arca" data-type="+1x ETF" data-leverage="1x" data-correlation="direct" data-marketgroup="S&P500">
+                <tr>
+                  <td rowspan="2">arcx</td>
+                  <td rowspan="2">+1x ETF</td>
+                  <td rowspan="2">
+                    <div>
+                      <span data-css-binding="x-market-status[data-exchange]">&nbsp;</span>
+                      <span data-css-binding="x-market-status[data-type]"></span>
+                      <span>
+                        <a href="#user-info-arca-spy"></a>
+                      </span>
+                      <span>SPY</span>
+                    </div>
+                  </td>
+                  <td>433.72</td>
+                  <td>439.69</td>
+                  <td>440.04</td>
+                  <td>432.94</td>
+                  <td>130.4</td>
+                </tr>
+                <tr>  
+                  <td data-sign="+"><span>2.02</span></td>
+                  <td data-sign="+"><span>0.02</span></td>
+                  <td data-sign="-"><span>-3.67</span></td>
+                  <td data-sign="0"><span>0.00</span></td>
+                  <td data-sign="+"><span>30.49</span></td>
+                </tr>
+              </tbody>
+              <tbody data-exchange="xasx" data-type="-2x ETF" data-leverage="2x" data-correlation="inverse" data-marketgroup="S&P500">
+                <tr>
+                  <td rowspan="2">xasx</td>
+                  <td rowspan="2">-2x ETF</td>
+                  <td rowspan="2">
+                    <div>
+                      <span data-css-binding="x-market-status[data-exchange]">&nbsp;</span>
+                      <span data-css-binding="x-market-status[data-type]"></span>
+                      <span>
+                        <a href="#user-info-xasx-bbus"></a>
+                      </span>
+                      <span>BBUS</span>
+                    </div>
+                  </td>
+                  <td>433.72</td>
+                  <td>439.69</td>
+                  <td>440.04</td>
+                  <td>432.94</td>
+                  <td>130.4</td>
+                </tr>
+                <tr>  
+                  <td data-sign="-"><span>-2.02</span></td>
+                  <td data-sign="-"><span>-0.17</span></td>
+                  <td data-sign="-"><span>-3.67</span></td>
+                  <td data-sign="+"><span>1.41</span></td>
+                  <td data-sign="+"><span>30.49</span></td>
+                </tr>
+              </tbody>
+              <tbody data-exchange="xnas" data-type="+3x ETF" data-leverage="3x" data-correlation="direct" data-marketgroup="NASDAQ100">
+                <tr>
+                  <td rowspan="2">xnas</td>
+                  <td rowspan="2">+3x ETF</td>
+                  <td rowspan="2">
+                    <div>
+                      <span data-css-binding="x-market-status[data-exchange]">&nbsp;</span>
+                      <span data-css-binding="x-market-status[data-type]"></span>
+                      <span>
+                        <a href="#user-info-xnax-tqqq"></a>
+                      </span>
+                      <span>TQQQ</span>
+                    </div>
+                  </td>
+                  <td>433.72</td>
+                  <td>439.69</td>
+                  <td>440.04</td>
+                  <td>432.94</td>
+                  <td>130.4</td>
+                </tr>
+                <tr>  
+                  <td data-sign="-"><span>-2.02</span></td>
+                  <td data-sign="+"><span>0.02</span></td>
+                  <td><span>0.00</span></td>
+                  <td data-sign="+"><span>1.41</span></td>
+                  <td data-sign="+"><span>30.49</span></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="7">&nbsp;</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </details>
+      </x-market-status>  
+    </section>
+  </main>
+
+  <footer>
+    <div>
+      <p>
+        The information provided in this email is general in nature only and does not constitute personal financial advice. The information has been prepared without taking into account your personal objectives, financial situation or needs. Before acting on any information in this email you should consider the appropriateness of the information having regard to your objectives, financial situation and needs. Whilst the author has tried to ensure the accuracy and completeness of the contents of this email, the author cannot offer any undertaking or guarantee, either expressly or implicitly, including liability towards third parties, regarding how correct, complete or up to date the contents of this email are. The author reserves the right to supplement this email at any time or to change or delete any information contained or views expressed in this email.The author of this email is not an Australian financial services (AFS) licensee, nor are they an authorised representative, employee or director of an AFS licensee, nor an employee or director of a related body corporate of an AFS licensee. Finally, the author is not authorised to provide personal advice in relation to relevant financial products to retail clients (consumers).
+      </p>
+      <p>Images from: <a href="https://www.svgrepo.com/">SVG Repo</a> and <a href="https://www.freefavicon.com">freefavicon</a></p>
+    </div>
+  </footer>
+
+</body>
+
+<script type="text/javascript"> 
+
+ /** global *******************************************************************************/
+  window.addEventListener('DOMContentLoaded', (event) => {
+    // Add filter handlers to x-components that have an x-filter component as a descendant.
+    document.querySelectorAll('x-user-menu, x-position-status, x-market-status')
+      .forEach((element) => {
+        element.addEventListener('click', (event) => {
+          if(event.target.name && event.target.name.includes('data-x-filter')) {
+            event.stopPropagation();
+            xDataFilter(event);
+          }
+        });
+        xDataFilterPrimeAttributes(element);
+      })
+  });
+
+ /**
+  * Build arrays of checkboxes, attribute names and attribute values. Checked parameter means 
+  * either 'select all' or 'clear all' functions have been invoked.
+  */
+  const xDataFilterBuildData = (component, checkboxSelector, checked) => {
+    let attributes = [];
+    let values = [];
+    let checkboxes = component.querySelectorAll(checkboxSelector);
+    // Build up two arrays, one for filter name, and one for associated filter values
+    checkboxes.forEach((checkbox) => {
+      let value = (checked==undefined) 
+        ? ((checkbox.checked) ? checkbox.value : '')
+        : ((checked==true) ? checkbox.value : '');
+      if(!attributes.includes(checkbox.name)) {
+        attributes.push(checkbox.name);
+        values.push([value]);
+      } else {
+        values[attributes.indexOf(checkbox.name)].push(value);
+      }
+    });
+    return {
+      'checkboxes' : checkboxes,
+      'attributeNames' : attributes,
+      'attributeValues' : values
+    }
+  };
+
+ /**
+  * Run through the descendant filter's settings and add them as attributes to the parent 
+  * x-component.
+  */
+  const xDataFilterPrimeAttributes = (component) => {
+    const defaultName = 'x-filter';
+    const prefix = `data-${defaultName}`;
+    const checkboxSelector = `[name^=${prefix}][type="checkbox"]`;
+    const data = xDataFilterBuildData(component, checkboxSelector);
+    data.attributeNames.forEach((attrName) => {
+      let attrValue = data.attributeValues[data.attributeNames.indexOf(attrName)].join(' ').trim();
+      component.setAttribute(attrName, attrValue);
+    })
+  }
+
+ /**
+  * x-filter components can be a child of any other x-component. The inputs of an x-filter 
+  * component are not likely to be ancestors of the elements they are intended to manipulate, 
+  * meaning that CSS cannot be used directly to implement visual state. So, x-filter settings are 
+  * 'hoisted' to the nearest parent x-component of the x-filter, by manipulating the parent's 
+  * data-attributes. From there, CSS rules can be used to implement the visual state of the 
+  * x-filter settings, anywhere in the parent x-component.
+  * To do this, x-components that are known to have x-filter descendants are registered 
+  * with handlers for x-filter events, on DOMContentLoaded.
+  */
+  const xDataFilter = (event) => {
+
+    const target = event.target;
+    const component = event.currentTarget;
+    const defaultName = 'x-filter';
+    const prefix = `data-${defaultName}`;
+    const cntrl = 'control';
+    const control = `${prefix}-${cntrl}`;
+    const checkboxSelector = `[type="checkbox"]:not([name*="${cntrl}"])`;
+    
+    // Sync all checkboxes with the same name with the target state
+    const syncCheckboxes = (target) => {
+      document.querySelectorAll(`[name="${target.name}"][value="${target.value}"]`).forEach(
+        node => node.checked = target.checked
+      )
+    };
+
+    // Sync all attributes with the same name with the value parameter
+    const syncAttributes = (name, value) => {
+      document.querySelectorAll(`[${name}]:not(input)`).forEach((node) => {
+        node.setAttribute(name, value)
+      })
+    };
+
+    // Find out if the checkbox needs to be synchronised with other filter components
+    let sync = component.getAttribute(`${control}-sync`) == 'true';
+    
+    // Default approach is as if checkbox is unchecked, so remove checkbox value from relevant 
+    // component attribute list of values.
+    const attrName = target.name;
+    let attrValue = 
+      (target.type == 'checkbox') 
+      && component.getAttribute(attrName).replace(target.value, "").trim();
+
+    switch (target.type) {
+      case 'checkbox':
+        switch (attrName) {
+          case `${control}-toggle`:
+            // Get the first <details> ancestor whose <summary> will contain toggle control
+            // let details = target.closest('details');    
+            let details = component.querySelector('details');      
+            if(!details.hasAttribute('open')) {
+              // Details drawer is closed so open drawer and force filter to checked & 'show' state
+              details.setAttribute('open', ''); 
+              target.checked = true;
+            }
+            if(target.checked) attrValue = `${attrValue} ${target.value}`.trim();
+            component.setAttribute(attrName, attrValue);          
+            break;
+          case `${control}-sync`:
+            // All sync checkboxes are always synchronised whenever their state changes
+            sync = true;
+            if(target.checked) {
+              // On checking async checkbox, immediately apply state of all checkboxes in its 
+              // parent filter to all other filters. Do not break so that the sync checkbox itself 
+              // can be handled with the switch default.
+              let filters = component.attributes;
+              for(var i = filters.length - 1; i >= 0; i--) {
+                if(!filters[i].name.includes('contol'))
+                  syncAttributes(filters[i].name, filters[i].value)
+              }
+              filters = component.querySelectorAll(`[name^=${prefix}]:not([name*="${cntrl}"])`);
+              filters.forEach(filter => syncCheckboxes(filter));
+            }
+          default:
+            // If checkbox is checked, add checkbox value to relevant component attribute
+            if(target.checked) attrValue = `${attrValue} ${target.value}`.trim();
+            // Update component attribute with attrValue. Note that attrValue was 'reset' just 
+            // prior to this switch statement.
+            component.setAttribute(attrName, attrValue);
+            // If synchronising, set all other filters in the DOM to the same state
+            if(sync) {
+              syncCheckboxes(target);
+              syncAttributes(target.name, attrValue);
+            }
+        }
+      break;
+    case 'button':
+      // Default to 'clear all' state, as if the 'clear all' button was clicked.
+      let checked = false;
+      // Set to 'select all' state if that was the button that was clicked.
+      if (attrName == `${control}-select-all`) checked = true;
+      // Get checkbox, attribute name and attribute value data
+      const data = xDataFilterBuildData(component, checkboxSelector, checked);
+      // Set all of the filter's checkboxes; sync all other checkboxes if sync if enabled
+      data.checkboxes.forEach((checkbox) => {
+        checkbox.checked = checked;
+        sync && syncCheckboxes(checkbox);
+      });
+      // Set the filter's attributes and if sync enabled, sync all other attributes
+      data.attributeNames.forEach((attrName) => {
+        attrValue = (checked) 
+          ? data.attributeValues[data.attributeNames.indexOf(attrName)].join(' ') 
+          : '';
+        component.setAttribute(attrName, attrValue);
+        sync && syncAttributes(attrName, attrValue);
+      })
+      break;
+    }
+  
+    // Set attribute to indicate that filtering is occurring.
+    // Filtering is occurring when one or more checkboxes are disabled.
+    const attrFilter = `${control}-filtered`;
+    document.querySelectorAll('x-user-menu, x-position-status, x-market-status')
+      .forEach((component) => {
+        component.setAttribute(attrFilter, "");
+        Array
+          .from(component.querySelectorAll(checkboxSelector))
+          .some(filter => !filter.checked)
+        && component.setAttribute(attrFilter, 'active');
+      })
+
+  }
+
+</script>
+
+</html>

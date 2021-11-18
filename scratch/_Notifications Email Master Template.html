@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="https://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--<![endif]-->
+    <title></title>
+    <!--[if mso]>
+    <style type="text/css">
+        table {border-collapse:collapse;border-spacing:0;margin:0;}
+        div, td {padding:0;}
+        div {margin:0 !important;}
+    </style>
+    <noscript>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:PixelsPerInch>96</o:PixelsPerInch>
+        </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+
+	<!-- References and notes:
+	1. Colour palette https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/color/ 
+		red: rgb(255 105 97) #FF6961
+		blue: rgb(64 156 255) #409CFF
+		green: rgb(52 199 89) #34C759
+		orange: rgb(255 149 0) #FF9500
+		yellow: rgb(255 212 38) #FFD426
+		gray: rgb(142 142 147) #8E8E93 (~30% black)
+		gray-light: rgb(242 242 247) #F2F2F7 (~5% black)
+		gray-light-shadow: rgb(174 174 178) #AEAEB2 (~20% black)
+		gray-dark-shadow: rgb(58 58 60) #3A3A3C (~60% black)
+	2. Ref -mso- style attributes https://stigmortenmyre.no/mso/html/concepts/ofconstyletable.htm
+	3. Google embed images (ref: https://dev.to/imamcu07/embed-or-display-image-to-html-page-from-google-drive-3ign)
+		a. Get share link from Google Drive (e.g. https://drive.google.com/file/d/1uN2pgTj6bFf2-MyQoVaqgUAFHyy1R6Yj/view?usp=sharing)
+		b. Extract id from share link, which is between 'd/' and '/view' (e.g. 1uN2pgTj6bFf2-MyQoVaqgUAFHyy1R6Yj from above example)
+		c. Prefix id with 'https://drive.google.com/thumbnail?id='
+		d. Example of final URL: https://drive.google.com/thumbnail?id=1uN2pgTj6bFf2-MyQoVaqgUAFHyy1R6Yj
+	-->
+
+</head>
+
+<body style="margin:0;padding:0;word-spacing:normal">
+	<div aria-roledescription="email" lang="en" role="article" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border:0;border-collapse:collapse;border-spacing:0;margin:0;padding:0" width="100%">
+            <tr style="border:0">
+                <td align="center" style="padding:0;text-align:center;width:100%">
+					<!--[if mso]>
+					<table role="presentation" align="center" style="width:660px;">
+					<tr>
+					<td style="padding:0;width:100%">
+					<![endif]-->
+					<div class="outer" style="font-family:'Segoe UI','Lucida Grande', Tahoma,Arial,sans-serif;max-width:660px;margin:0 auto 20px auto;padding:0;text-align:left;width:100%">
+
+						<div class="trading-day-summary" style="background-color:#F2F2F7;border-radius:8px;box-shadow: 0 8px 8px -8px #AEAEB2;margin:0;padding:8px 8px 0 8px">
+							<table border="0" cellpadding="0" cellspacing="0" style="border:0;border-collapse:collapse;border-spacing:0;margin:0;padding:0" width="100%">
+								<tbody>
+<!--TEMPLATE: summary-->			<!--Daily summary template data
+										|date| 'ddd, dd mmm yyyy'
+										|type| 'Idle' || 'Alert' || 'Strategy'
+										|title| 'ACTION<br/>ALERT!' || Strategy name
+										|instruction| string
+									-->
+									<!--Daily summary template preproccessing
+										Collapsed template html:
+											type='Idle': <tr><td colspan="2">There are no new trades for the next trading day on |date|.</td></tr>
+											type='Alert': <tr class="dstr"><td class="dstd1"><p class="dsp">|title|</p></td><td class="dstd2">New trades need to be executed on the next trading day, |date|.</td></tr>
+											type='Strategy': <tr class="dstr"><td class="dstd1"><p class="dsp">|title|</p></td><td class="dstd2">|instruction|</td></tr>
+										Prepocessor templates: 
+											type='Idle': |1||date||2|
+											type='Alert': |3||title||4||date||5|
+											type='Strategy': |6||title||7||instruction||8|
+										Maximum string length for |title| + |instruction| is 242 
+										Preprocessor html fragments:
+											|1| <tr><td colspan="2">There are no new trades for the next trading day on 
+											|2| .</td></tr>
+											|3| <tr class="dstr"><td class="dstd1"><p class="dsp">
+											|4| </p></td><td class="dstd2">New trades need to be executed on the next trading day, 
+											|5| .</td></tr>
+											|6| <tr class="dstr"><td class="dstd1"><p class="dsp">
+											|7| </p></td><td class="dstd2">
+											|8| </td></tr>
+										To use preprocessor:
+											1. Fill prepocessor template with data lists, selecting HTML fragments simultaneously, based on data. This creates a list of preprocessor templates.
+											2. Explode (textjoin) the proproccessor list into a single string 
+											3. Substitute preprocessor HTML fragment codes with corresponding HTML fragments
+									-->
+									<!--Daily summary template (styling name prefix: 'ds')
+									<style>
+										.dstr {border-bottom:8px solid transparent}
+										.dstd1 {width:25%}
+										.dsp {background-color:#FFD426;border-radius:4px;margin:0;padding:4px;text-align:center}
+										.dstd2 {padding-left:8px}
+									</style>
+									// type='Alert', type='Strategy'
+									<tr class="dstr">
+										<td class="dstd1"><p class="dsp">|title|</p></td>
+										<td class="dstd2">|instruction|</td>
+									</tr>
+									// type='Idle'
+									<tr><td colspan="2">There are no new trades for the next trading day on Mon, |date|.</td></tr>
+									-->
+									<tr style="border-bottom:8px solid transparent">
+										<td style="width:25%"><p style="background-color:#FFD426;border-radius:4px;margin:0;padding:4px;text-align:center">ACTION<br/>ALERT!</p></td>
+										<td style="padding-left:8px">New trades need to be executed on the next trading day, Mon, 12 Jul 2021.</td>
+									</tr>
+									<tr style="border-bottom:8px solid transparent">
+										<td><p style="background-color:#FFD426;border-radius:4px;margin:0;padding:4px;text-align:center">US Equity Investing Strategy</p></td>
+										<td style="padding-left:8px">Exit current bearish position on S&amp;P500 Index at market. Enter new bullish position on NASDAQ100 Index at limit +0.85%.</td>
+									</tr>
+									<tr style="border-bottom:8px solid transparent">
+										<td><p style="background-color:#FFD426;border-radius:4px;margin:0;padding:4px;text-align:center">US Speculative Trading Strategy</p></td>
+										<td style="padding-left:8px">Exit current bearish position on OIL at market. Enter new bearish position on VIXY at limit -1.89%.</td>
+									</tr>
+									<!---->
+									<!--<tr><td colspan="2">There are no new trades for the next trading day on Mon, 12 Jul 2021.</td></tr>-->
+								</tbody>
+							</table>
+						</div>
+						
+						<div class="trading-day-market-data" style="background-color:#F2F2F7;border-radius:8px;box-shadow: 0 8px 8px -8px #AEAEB2;margin:30px 0 0 0;padding:8px">
+							<h1 style="font-weight:normal;margin:0 0 8px 0">US markets at close Fri, 09 Jul 2021</h1>
+							<table border="0" cellpadding="0" cellspacing="0" style="border:0;border-collapse:collapse;border-spacing:0;margin:0;padding:0;text-align:center" width="100%">
+								<thead>
+									<tr style="border-bottom:4px solid transparent">
+										<th style="width:10%">&nbsp;</th>
+										<th style="width:10%">Open</th>
+										<th style="width:10%">High</th>
+										<th style="width:10%">Low</th>
+										<th style="width:10%">Close</th>
+										<th style="width:10%">%Day</th>
+										<th style="width:10%">%Wk</th>
+										<th style="width:10%">%Mth</th>
+										<th style="width:10%">%Qtr</th>
+										<th style="width:10%">%Yr</th>
+									</tr>
+								</thead>
+								<tbody>
+<!--TEMPLATE: market-data-->		<!--Daily market pricing template data
+										|code| string
+										|open| number
+										|high| number
+										|low| number
+										|close| number
+										|day| number
+										|wk| number
+										|mth| number
+										|qtr| number
+										|yr| number
+										Class variant: 'class=".mdtr"' || '' (set with odd and even row numbering)
+										Class variant: '.p-UP' || '.p-DOWN' (set with +ve or -ve number)
+									-->
+									<!--Daily market pricing template preproccessing
+										Collapsed template html:
+											<tr class="mdtr"><td><p class="mdp">|code|</p></td><td>|open|</td><td>|high|</td><td>|low|</td><td>|close|</td><td><p class="mdp-DOWN">|day|</p></td><td><p class="mdp-DOWN">|wk|</p></td><td><p class="mdp-UP">|mth|</p></td><td><p class="mdp-UP">|qtr|</p></td><td><p class="mdp-UP">|yr|</p></td></tr>
+										Prepocessor template: 
+											|1||code||3||open||4||high||5||low||6||close||7||day||9||wk||11||mth||13||qtr||15||yr||17|
+											or |2||code||3||open||4||high||5||low||6||close||8||day||10||wk||12||mth||14||qtr||16||yr||17|
+											or variations...
+										Preprocessor tempalte filled with data: 120 characters max
+											|1||XXXX||3||000.00||4||000.00||5||000.00||6||000.00||7||+000.00||9||+000.00||11||+000.00||13||+000.00||15||+000.00||17|
+										Preprocessor html fragments:
+											  |1|,|2| <tr class="mdtr"><td><p class="mdp"> or |2| <tr><td><p class="mdp">
+												  |3| </p></td><td>
+												  |4| </td><td>
+											      |5| </td><td>
+											      |6| </td><td>
+											  |7|,|8| </td><td><p class="mdp-DOWN">        or |8| </td><td><p class="mdp-UP">
+											 |9|,|10| </p></td><td><p class="mdp-DOWN">    or |10| </p></td><td><p class="mdp-UP">
+											|11|,|12| </p></td><td><p class="mdp-DOWN">    or |12| </p></td><td><p class="mdp-UP">
+											|13|,|14| </p></td><td><p class="mdp-DOWN">    or |14| </p></td><td><p class="mdp-UP">
+											|15|,|16| </p></td><td><p class="mdp-DOWN">    or |16| </p></td><td><p class="mdp-UP">
+											     |17| </p></td></tr>
+										To use preprocessor:
+											1. Fill prepocessor template with data lists, selecting HTML fragment codes simultaneously, based on data. This creates a list of preprocessor templates.
+											2. Explode (textjoin) the proproccessor list into a single string 
+											3. Substitute preprocessor HTML fragment codes with corresponding HTML fragments
+									-->
+									<!--Daily market pricing template (styling class name prefix: 'md')
+									<style>
+										.mdtr {background-color:#FFFFFF} 
+										.mdp {background-color:#FF6961;border-radius:4px;margin:1px;padding:2px}
+										.mdp-UP {background-color:#409CFF;border-radius:4px;margin:1px;padding:2px}
+										.mdp-DOWN {background-color:#FF6961;border-radius:4px;margin:1px;padding:2px}
+									</style>
+									<tr class="mdtr">
+										<td><p class="mdp">|code|</p></td>
+										<td>|open|</td>
+										<td>|high|</td>
+										<td>|low|</td>
+										<td>|close|</td>
+										<td><p class="mdp-DOWN">|day|</p></td>
+										<td><p class="mdp-DOWN">|wk|</p></td>
+										<td><p class="mdp-UP">|mth|</p></td>
+										<td><p class="mdp-UP">|qtr|</p></td>
+										<td><p class="mdp-UP">|yr|</p></td>
+									</tr>
+									-->
+									<tr style="background-color:#FFFFFF">
+										<td><p style="background-color:#FF6961;border-radius:4px;margin:1px;padding:2px">SPY</p></td>
+										<td>431.41</td>
+										<td>431.41</td>
+										<td>431.41</td>
+										<td>431.41</td>
+										<td><p style="background-color:#FF6961;border-radius:4px;margin:1px;padding:2px">-1.96</p></td>
+										<td><p style="background-color:#FF6961;border-radius:4px;margin:1px;padding:2px">-2.32</p></td>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">+6.05</p></td>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">+9.62</p></td>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">+32.49</p></td>
+									</tr>
+									<!---->
+									<tr>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">QQQ</p></td>
+										<td>331.66</td>
+										<td>321.04</td>
+										<td>349.33</td>
+										<td>338.76</td>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">+0.84</p></td>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">+3.55</p></td>
+										<td><p style="background-color:#FF6961;border-radius:4px;margin:1px;padding:2px">-4.82</p></td>
+										<td><p style="background-color:#FF6961;border-radius:4px;margin:1px;padding:2px">-12.25</p></td>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">+41.11</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF">
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">USO</p></td>
+										<td>31.41</td>
+										<td>32.61</td>
+										<td>29.98</td>
+										<td>23.32</td>
+										<td><p style="background-color:#FF6961;border-radius:4px;margin:1px;padding:2px">-1.96</p></td>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">+2.32</p></td>
+										<td><p style="background-color:#FF6961;border-radius:4px;margin:1px;padding:2px">-6.05</p></td>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">+49.62</p></td>
+										<td><p style="background-color:#409CFF;border-radius:4px;margin:1px;padding:2px">+105.22</p></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="strategy-action" style="background-color:#F2F2F7;border-radius:8px;box-shadow: 0 8px 8px -8px #AEAEB2;margin:30px 0 0 0;padding:8px">
+							<table border="0" cellpadding="0" cellspacing="0" style="border:0;border-collapse:collapse;border-spacing:0;margin:0;padding:0" width="100%">
+								<thead class="strategy-title">
+									<tr style="font-size:0">
+										<td style="width:10%">1</td>
+										<td style="width:10%">2</td>
+										<td style="width:10%">3</td>
+										<td style="width:10%">4</td>
+										<td style="width:10%">5</td>
+										<td style="width:10%">6</td>
+										<td style="width:10%">7</td>
+										<td style="width:10%">8</td>
+										<td style="width:10%">8</td>
+										<td style="width:10%">10</td>
+									</tr>
+<!--TEMPLATE: title-->				<!--Strategy title and peformance template data
+										|name| string
+										|gain| "+0.00%;-0.00%"
+										|days| '0'
+										|date| 'dd mmm'
+									-->
+									<!--Strategy title and peformance template (styling class name prefix: 'sp')
+									<style>
+										.sptr {border-bottom:8px solid transparent}
+										.sph1 {font-weight:normal;margin:0;padding:0}
+										.spp {background-color:#409CFF;border-radius:4px;margin:0;text-align:right}
+										.spb1 {display:block;padding:4px 4px 0 0}
+										.spb2 {display:block;padding:0 4px 4px 0}
+									</style>
+									<tr class="sptr">
+										<td colspan="8"><h1 class="sph1">|name|</h1></td>
+										<td colspan="2">
+											<p class="spp">
+												<b class="spb1">|gain|</b>
+												<b class="spb2">|days| <small>days, |date|</small></b>
+											</p>
+										</td>
+									</tr>
+									-->
+									<tr style="border-bottom:8px solid transparent">
+										<td colspan="8"><h1 style="font-weight:normal;margin:0;padding:0;">US Equities Investing Strategy</h1></td>
+										<td colspan="2">
+											<p style="background-color:#409CFF;border-radius:4px;margin:0;text-align:right">
+												<b style="display:block;padding:4px 4px 0 0">+16.07%</b>
+												<b style="display:block;padding:0 4px 4px 0">248 <small>days, 28 Aug</small></b>
+											</p>
+										</td>
+									</tr>
+								</thead>
+<!--TEMPLATE: position block-->	<!--Position block template data 
+									|action| 'EXIT' or 'ENTER' or 'HOLD'
+									|positions| exploded html fragments from templates 'Position action' and 'Instument action' 
+									Data-driven element 'tbody':
+										a. <tbody class="pbtb-EXIT">
+										b. <tbody class="pbtb-ENTER">
+										c. <tbody class="pbtb-HOLD">
+								-->
+								<!--Position block template (style class name prefix: 'pb')
+								<style>
+									.pbtb-EXIT {color:#FF9500}
+									.pbtb-ENTER {color:#34C759}
+									.pbtb-HOLD {color:#8E8E93}
+								</style>
+								<tbody class="pbtb-EXIT">
+									|positions|
+								</tbody>
+								-->
+								<tbody class="strategy-position-1" style="color:#FF9500">
+<!--TEMPLATE: Position action-->	<!--Position action template data
+										|type| 'EXIT', 'ENTER', 'HOLD', 'IDLE'
+										|action| 'EXIT', 'ENTER', 'HOLD' from |type|
+										|actionadj| 'the current' or 'a new' from |action|
+										|executiondate| 'ddd, dd mmm yyyy'
+										|sentiment| 'bullish' || 'bearish'
+										|market| string
+										|price| 'market price' || 'a limit of +0.00%;-0.00%"
+										Data-driven element 'p'
+											a. <p class="pap-EXIT">
+											b. <p class="pap-ENTER">
+									-->
+									<!--Position action preprocessing
+										Collapsed html templates with class and data placeholders
+										type = 'IDLE':
+
+										type = 'HOLD':
+
+										type = 'EXIT' or 'ENTER':
+
+										Preprocessor templates
+											type = 'IDLE':
+
+											type = 'HOLD':
+
+											type = 'EDIT' or 'ENTER':
+
+										Preprocessor html fragments
+
+
+									<!--Position action template (styling class name prefix: 'pa' 'px')
+									// type = 'EXIT' or 'ENTER':
+									<style>
+										.patr {border-color:transparent;border-style:solid;border-width:2px 0}
+										.pap-EXIT {background-color:#FF9500;border-radius:4px;color:#000000;margin:0;text-align:center}
+										.pap-ENTER {background-color:#34C759;border-radius:4px;color:#000000;margin:0;text-align:center}
+										.pab1 {display:block;padding:8px 4px 0 0}
+										.pab2 {display:block;padding:0 4px 8px 0}
+										.pap2 {margin:0;padding:0 4px}
+										.pab3 {display:inline-block;white-space:nowrap}
+									</style>
+									<tr class="patr">
+										<td colspan="3">
+											<p class="pap*">
+												<b class="pab1">|action|</b>
+												<b class="pab2">|executiondate|</b>
+											</p>
+										</td>
+										<td colspan="7">
+											<p class="pap2">
+												<b>|action|</b> |actionadj| <b>|sentiment|</b> position on <b>|market|</b>, at <b>|price|</b>, on <b class="pab3">|executiondate|</b>
+											</p>
+										</td>
+									</tr>
+									// type = 'HOLD':
+									<style>
+										.phtr {border-color:transparent;border-style:solid;border-width:2px 0}
+										.php1 {background-color:#8E8E93;border-radius:4px;color:#000000;margin:0;text-align:center}
+										.phb1 {display:block;padding:14px 4px 14px 0}
+										.php2 {margin:0;padding:0 4px}
+									</style>
+									<tr class=phtr">
+										<td colspan="3"><p class="php1" ><b class="phb1">HOLD</b></p></td>
+										<td colspan="7"><p class="php2"><b>|action|</b> the current <b>|sentiment|</b> position on <b>|market|</b></p></td>
+									</tr>
+									// type='IDLE':
+									<style>
+										.sitr {border-color:transparent;border-style:solid;border-width:2px 0}
+										.sip2 {margin:0;padding:0 4px}
+									</style>
+									<tr class=phtr">
+										<td colspan="10"><p class="sip2">A.I. is not detecting any signals currently, and are continuing to scan for low risk opportunities.</p></td>
+									</tr>
+									-->
+									<tr style="border-color:transparent;border-style:solid;border-width:2px 0">
+										<td colspan="3">
+											<p style="background-color:#FF9500;border-radius:4px;color:#000000;margin:0;text-align:center">
+												<b style="display:block;padding:8px 4px 0 0">EXIT</b>
+												<b style="display:block;padding:0 4px 8px 0">Mon, 12 Jul 2021</b>
+											</p>
+										</td>
+										<td colspan="7">
+											<p style="margin:0;padding:0 4px">
+												<b>EXIT</b> the current <b>bearish</b> position on <b>S&amp;P500 Index</b>, at <b>market price</b>, on <b style="display:inline-block;white-space:nowrap">Mon, 12 Jul 2021</b>
+											</p>
+										</td>
+									</tr>
+									<!---->
+<!--TEMPLATE: instrument action-->	<!--Strategy instrument action template data
+										|market| underlying market for instruments
+										|sentiment| 'bullish' || 'bearish'
+										*|instrument| list of string, from configuration of instruments for that |market| and |sentiment|
+										*|v| list of string, from configuration of leverages for that |market| and |sentiment|
+										*|country| list of string, from configuration of countries for that |market| and |sentiment|
+										*|row| number (row index)
+										|type| 'SELL', 'BUY', 'HOLD'
+										|action| string, from |type|
+										*|entry| list of number
+										*|last| list of number
+										*|move| list of percentage
+										*|limit| list of operators: '>' || '<' || '@'
+										*|price| list of prices: '0.00'
+										*|calc| list of calcs: last '0.00' || limit '+0.00%;-0.00%' on last '0.00'
+										Data-driven element 'tr'
+											a. <tr class="ihtr"> 																								[for even-numbered row]
+											b. <tr> 																											[for odd-numbered row]
+										Data-driven element 'img'
+											a. <img src="https://drive.google.com/thumbnail?id=1uN2pgTj6bFf2-MyQoVaqgUAFHyy1R6Yj" alt="AU" class="ihimg"/>		[for country='AU']
+											b. <img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" class="ihimg"/>		[for country='US']
+										Data-driven element 'b3'
+											a. <b class="ihb3-DOWN">																							[for move<0] 
+											b. <b class="ihb3-UP">																								[for move>0]
+										Data-driven element 'tr': 
+											a. <tr class="iatr">																								[for even-numbered row]
+											b. <tr>																												[for odd-numbered row]
+										Data-driven element 'img':
+											a. <img src="https://drive.google.com/thumbnail?id=1uN2pgTj6bFf2-MyQoVaqgUAFHyy1R6Yj" alt="AU" class="iaimg"/>		[for country='AU']
+											b. <img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" class="iaimg"/>		[for country='US']
+										Data-drive element 'iab2':
+											a. <b class="iab2-SELL">																							[for type='SELL']
+											b. <b class="iab2-BUY">																								[for type='BUY']
+									-->
+									<!--Strategy instrument action template preproccessing
+										Collapsed html template with class and data placeholders:
+											type='HOLD':
+												<tr*><td colspan="2" class="ixtd1"><p class="ixp1">|v|</p><img src="*" alt="*" class="iximg"/><b class="ixb1">|action|</b></td><td colspan="3" class="ixtd2"><b class="ixb2">|instrument|</b></td><td colspan="3" class="ixtd3"><small>entry |entry|, last |last|</small></td><td colspan="2" class="ixtd4"><b class="ixb3*">|move|</b></td></tr>
+											type='SELL'|"BUY':
+												<tr*><td colspan="2" class="ixtd1"><p class="ixp1">|v|</p><img src="*" alt="*" class="iximg"/><b class="iab1">|action|</b></td><td colspan="4" class="ixtd2"><b class="ixb2*">|instrument| |limit| |price|</b></td><td colspan="4" class="ixtd3">|calc|</td></tr>
+										Prepocessor template: 
+											type='HOLD':
+												|1x||2||v||3||4x||5||action||6||26x||instrument||7||entry||8||last||9||10x||move||11|
+											type='SELL'|"BUY':
+												|1x||2||v||3||4x||5||action||25||26x||instrument| |limit| |price||27||calc||28|
+										Preprocessor html fragments:
+											|1a| <tr class="ixtr">
+											|1b| <tr>
+											|2|  <td colspan="2" class="ixtd1"><p class="ixp1">
+											|3|  </p>
+											|4a| <img src="https://drive.google.com/thumbnail?id=1uN2pgTj6bFf2-MyQoVaqgUAFHyy1R6Yj" alt="AU" class="iximg"/>	
+											|4b| <img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" class="iximg"/>
+											|5|  <b class="ixb1">
+											|6|  </b></td><td colspan="3" class="ixtd2">
+											|26a| <b class="ixb2-SELL">
+											|26b| <b class="ixb2-BUY">
+											|26c| <b class="ixb2-HOLD">
+											|7|  '</b></td><td colspan="3" class="ixtd3"><small>entry '
+											|8|  ', last '
+											|9|  </small></td><td colspan="2" class="ixtd4">
+											|10a| <b class="ixb3-DOWN">
+											|10b| <b class="ixb3-UP">
+											|11| </b></td></tr>
+											|25|  </b></td><td colspan="4" class="ixtd2">
+											|27|  </b></td><td colspan="4" class="ixtd3">
+											|28|  </td></tr>											
+									-->
+									<!--Strategy instrument action template (style class name prefixes: 'ix')
+									<style>
+										.ixtr {background-color:#FFFFFF}
+										.ixtd1 {padding:1px 4px;text-align:right}
+										.ixp1 {display:inline-block;margin:0;vertical-align:middle}
+										.iximg {vertical-align:middle}
+										.ixb1 {display:inline-block;vertical-align:middle}
+										.ixtd2 {padding:1px 0}
+										.ixb2-HOLD {background-color:#8E8E93;border-radius:4px;color:#000000;display:block;padding:2px 8px}
+										.ixb2-SELL {background-color:#FF9500;border-radius:4px;color:#000000;display:block;padding:2px 4px}
+										.ixb2-BUY {background-color:#34C759;border-radius:4px;color:#000000;display:block;padding:2px 4px}
+										.ixtd3 {padding:1px 4px}
+										.ixtd4 {padding:1px 0;text-align:right}
+										.ixb3-DOWN {background-color:#FF6961;border-radius:4px;color:#000000;display:block;padding:2px 4px}
+										.ixb3-UP {background-color:#409CFF;border-radius:4px;color:#000000;display:block;padding:2px 4px}
+									</style>
+									// type = 'HOLD':
+									<tr*>
+										<td colspan="2" class="ixtd1">
+											<p class="ixp1">|v|</p>
+											<img src="*" alt="*" class="iximg"/>
+											<b class="ixb1">|action|</b>
+										</td>
+										<td colspan="3" class="ixtd2"><b class="ixb2*">|instrument|</b></td>
+										<td colspan="3" class="ixtd3"><small>entry |entry|, last |last|</small></td>
+										<td colspan="2" class="ixtd4"><b class="ixb3*">|change|</b></td>
+									</tr>
+									// type = 'SELL' or 'BUY':
+									<tr*>
+										<td colspan="2" class="ixtd1">
+											<p class="ixp1">|v|</p>
+											<img src="*" alt="*" class="iximg"/>
+											<b class="ixb1">|action|</b>
+										</td>
+										<td colspan="4" class="ixtd2"><b class="ixb2*">|instrument| |limit| |price|</b></td>
+										<td colspan="4" class="ixtd3">|calc|</td>
+									</tr>
+									-->
+									<tr>
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle">-2x</p>
+											<img src="https://drive.google.com/thumbnail?id=1uN2pgTj6bFf2-MyQoVaqgUAFHyy1R6Yj" alt="AU" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle">SELL</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#FF9500;border-radius:4px;color:#000000;display:block;padding:2px 8px">BBUS @ 43.89</b></td>
+										<td colspan="4" style="padding:1px 4px;"><small>last 43.89</small></td>
+									</tr>
+									<!---->
+									<tr style="background-color:#FFFFFF">
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle">-1x</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle">SELL</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#FF9500;border-radius:4px;color:#000000;display:block;padding:2px 8px">SH @ 22.23</b></td>
+										<td colspan="4" style="padding:1px 4px"><small>last 22.23</small></td>
+									</tr>
+									<tr>
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle;">-2x</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle;">SELL</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#FF9500;border-radius:4px;color:#000000;display:block;padding:2px 8px">SDS @ 107.17</b></td>
+										<td colspan="4" style="padding:1px 4px"><small>last 107.17</small></td>
+									</tr>
+									<tr style="background-color:#FFFFFF">
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle;">-3x</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle;">SELL</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#FF9500;border-radius:4px;color:#000000;display:block;padding:2px 8px">SPXU @ 18.01</b></td>
+										<td colspan="4" style="padding:1px 4px"><small>last 18.01</small></td>
+									</tr>
+									<tr>
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle;">Put</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle;">SELL</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#FF9500;border-radius:4px;color:#000000;display:block;padding:2px 8px">SPY/17Z21P348 @ 37.49</b></td>
+										<td colspan="4" style="padding:1px 4px"><small>last 37.49</small></td>
+									</tr>
+								</tbody>
+								<tbody class="strategy-position-2" style="color:#34C759">							
+									<tr style="border-color:transparent;border-style:solid;border-width:2px 0">
+										<td colspan="3">
+											<p style="background-color:#34C759;border-radius:4px;color:#000000;margin:0;text-align:center">
+												<b style="display:block;padding:8px 4px 0 0">ENTER</b>
+												<b style="display:block;padding:0 4px 8px 0">Mon, 12 Jul 2021</b>
+											</p>
+										</td>
+										<td colspan="7">
+											<p style="margin:0;padding:0 4px">
+												<b>ENTER</b> a new <b>bullish</b> position on <b>NASDAQ100 Index</b>, at <b>a limit of +0.85%</b>, on <b style="display:inline-block;white-space:nowrap">Mon, 12 Jul 2021</b>
+											</p>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle">+2x</p>
+											<img src="https://drive.google.com/thumbnail?id=1uN2pgTj6bFf2-MyQoVaqgUAFHyy1R6Yj" alt="AU" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle">BUY</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#34C759;border-radius:4px;color:#000000;display:block;padding:2px 8px">LNAS &lt; 18.31</b></td>
+										<td colspan="4" style="padding:1px 4px;"><small>limit +1.70% on last 43.89</small></td>
+									</tr>
+									<tr style="background-color:#FFFFFF">
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle;">+1x</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle;">BUY</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#34C759;border-radius:4px;color:#000000;display:block;padding:2px 8px">QQQ &lt; 366.64</b></td>
+										<td colspan="4" style="padding:1px 4px"><small>limit +0.85% on last 22.23</small></td>
+									</tr>
+									<tr>
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle;">+2x</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle;">BUY</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#34C759;border-radius:4px;color:#000000;display:block;padding:2px 8px">QLD &lt; 36.62</b></td>
+										<td colspan="4" style="padding:1px 4px"><small>limit +1.70% on last 36.02</small></td>
+									</tr>
+									<tr style="background-color:#FFFFFF">
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle;">+3x</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle;">BUY</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#34C759;border-radius:4px;color:#000000;display:block;padding:2px 8px">TQQQ &lt; 102.55</b></td>
+										<td colspan="4" style="padding:1px 4px"><small>limit +2.55% on last 100.00</small></td>
+									</tr>
+									<tr>
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle;">Call</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle;">BUY</b>
+										</td>
+										<td colspan="4" style="padding:1px 0"><b style="background-color:#34C759;border-radius:4px;color:#000000;display:block;padding:2px 8px">QQQ/18H22C305 &lt; 36.62</b></td>
+										<td colspan="4" style="padding:1px 4px"><small>limit +4.25% on last 25.16</small></td>
+									</tr>
+								</tbody>
+								<tfoot class="strategy-footer">
+<!--TEMPLATE: footer-->				<!--Strategy footer template data
+										|executionguideurl| string
+										|factsheeturl| string
+									-->
+									<!--Strategy footer template preprocessing
+										Collapsed template html:
+											<tr><td colspan="10" class="sftd"><a href="|executionguideurl|" class="sfa">Execution guide</a> | <a href="|factsheeturl|" class="sfa">Fact sheet</a></td></tr>
+										Preprocessor template
+											|1||executionguideurl||2||factsheeturl||3|
+										Preprocessor html fragrments:
+												  |1| <tr><td colspan="10" class="sftd"><a href="
+												  |2| " class="sfa">Execution guide</a> | <a href="
+												  |3| " class="sfa">Fact sheet</a></td></tr>
+										To use preprocessor:
+											1. Fill prepocessor template with data lists, selecting HTML fragment codes simultaneously, based on data. This creates a list of preprocessor templates.
+											2. Explode (textjoin) the proproccessor list into a single string 
+											3. Substitute preprocessor HTML fragment codes with corresponding HTML fragments
+									-->
+									<!--Strategy footer template (styling class name prefix: 'sf')
+									<style>
+										.sftd {color:#8E8E93;font-size:smaller;padding:8px 0 0 0;text-align:right}
+										.sfa {color:#8E8E93}
+									</style>
+									<tr>
+										<td colspan="10" class="sftd"><a href="|executionguideurl|" class="sfa">Execution guide</a> | <a href="|factsheeturl|" class="sfa">Fact sheet</a></td>
+									</tr>
+									-->
+									<tr>
+										<td colspan="10" style="color:#8E8E93;font-size:smaller;padding:8px 0 0 0;text-align:right"><a href="#" style="color:#8E8E93">Execution guide</a> | <a href="#" style="color:#8E8E93">Fact sheet</a></td>
+									</tr>
+									<!---->
+								</tfoot>
+							</table>
+						</div>
+
+						<div class="strategy-hold-idle" style="background-color:#F2F2F7;border-radius:8px;box-shadow: 0 8px 8px -8px #AEAEB2;margin:30px 0 0 0;padding:8px">
+							<table border="0" cellpadding="0" cellspacing="0" style="border:0;border-collapse:collapse;border-spacing:0;margin:0;padding:0" width="100%">
+								<thead class="strategy-title">
+									<tr style="font-size:0">
+										<td style="width:10%">1</td>
+										<td style="width:10%">2</td>
+										<td style="width:10%">3</td>
+										<td style="width:10%">4</td>
+										<td style="width:10%">5</td>
+										<td style="width:10%">6</td>
+										<td style="width:10%">7</td>
+										<td style="width:10%">8</td>
+										<td style="width:10%">8</td>
+										<td style="width:10%">10</td>
+									</tr>
+									<tr style="border-bottom:8px solid transparent">
+										<td colspan="8"><h1 style="font-weight:normal;margin:0;padding:0;">US Speculative Trading Strategy</h1></td>
+										<td colspan="2">
+											<p style="background-color:#FF6961;border-radius:4px;margin:0;text-align:right">
+												<b style="display:block;padding:4px 4px 0 0">-3.66%</b>
+												<b style="display:block;padding:0 4px 4px 0">5 <small>days, 2 Feb</small></b>
+											</p>
+										</td>
+									</tr>
+								</thead>
+								<tbody class="strategy-position" style="color:#8E8E93">							
+<!--TEMPLATE: hold/idle block-->	<!--Strategy hold/idle template data
+										|type| 'HOLD' || 'IDLE'
+										|action| 'HOLD' from |type|='HOLD'
+										|sentiment| 'bearish' || 'bullish'
+										|market| string
+									-->
+									<!--Strategy hold/idle template preproccessing
+										Collapsed template html:
+											type='HOLD': 
+												<tr><td colspan="3"><p class="shp1" ><b class="shb1">HOLD</b></p></td><td colspan="7"><p class="shp2"><b>HOLD</b> the current <b>|sentiment|</b> position on <b>|market|</b></p></td></tr>
+											type='IDLE': 
+												<tr><td colspan="10"><p class="shp2">The AI algorithms are not detecting any signals currently, and are continuing to scan for low risk opportunities.</p></td></tr>
+										Preprocessor templates:
+											type='Hold': 
+												|1||sentiment||2||market||3|
+											type='Idle': 
+												|4|
+										Preprocessor html fragments:
+											|1| <tr><td colspan="3"><p class="shp1"><b class="shb1">HOLD</b></p></td><td colspan="7"><p class="shp2"><b>HOLD</b> the current <b>
+											|2| </b> position on <b>
+											|3| </b></p></td></tr>
+											|4| <tr><td colspan="10"><p class="shp2">The AI algorithms are not detecting any signals currently, and are continuing to scan for low risk opportunities.</p></td></tr>
+									-->
+									<!--Strategy hold/idle template (styling class name prefix: 'sh')
+									<style>
+										.shtr {border-color:transparent;border-style:solid;border-width:2px 0}
+										.shp1 {background-color:#8E8E93;border-radius:4px;color:#000000;margin:0;text-align:center}
+										.shb1 {display:block;padding:14px 4px 14px 0}
+										.shp2 {margin:0;padding:0 4px}
+									</style>
+									// type='HOLD':
+									<tr>
+										<td colspan="3"><p class="shp1" ><b class="shb1">HOLD</b></p></td>
+										<td colspan="7"><p class="shp2"><b>|action|</b> the current <b>|sentiment|</b> position on <b>|market|</b></p></td>
+									</tr>
+									// type='IDLE':
+									<tr>
+										<td colspan="10"><p class="shp2">The AI algorithms are not detecting any signals currently, and are continuing to scan for low risk opportunities.</p></td>
+									</tr>
+									-->
+									<tr style="border-color:transparent;border-style:solid;border-width:2px 0">
+										<td colspan="3"><p style="background-color:#8E8E93;border-radius:4px;color:#000000;margin:0;text-align:center"><b style="display:block;padding:14px 4px 14px 0">HOLD</b></p></td>
+										<td colspan="7"><p style="margin:0;padding:0 4px"><b>HOLD</b> the current <b>bearish</b> position on <b>OIL</b></p></td>
+									</tr>
+									<!---->
+									<tr>
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle">-1x</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle">HOLD</b>
+										</td>
+										<td colspan="3" style="padding:1px 0"><b style="background-color:#8E8E93;border-radius:4px;color:#000000;display:block;padding:2px 8px">SCO</b></td>
+										<td colspan="3" style="padding:1px 4px"><small>entry 46.31, last 43.16</small></td>
+										<td colspan="2" style="padding:1px 0;text-align:right"><b style="background-color:#FF6961;border-radius:4px;color:#000000;display:block;padding:2px 4px">-1.77%</b></td>
+									</tr>
+									<!---->
+									<tr style="background-color:#FFFFFF">
+										<td colspan="2" style="padding:1px 4px;text-align:right">
+											<p style="display:inline-block;margin:0;vertical-align:middle">-2x</p>
+											<img src="https://drive.google.com/thumbnail?id=1F201-3oZIIbBlSAez_8Vss3biZb71snV" alt="US" style="vertical-align:middle"/>
+											<b style="display:inline-block;vertical-align:middle">HOLD</b>
+										</td>
+										<td colspan="3" style="padding:1px 0"><b style="background-color:#8E8E93;border-radius:4px;color:#000000;display:block;padding:2px 8px">QQQ/18H22C305</b></td>
+										<td colspan="3" style="padding:1px 4px"><small>entry 46.31, last 43.16</small></td>
+										<td colspan="2" style="padding:1px 0;text-align:right"><b style="background-color:#FF6961;border-radius:4px;color:#000000;display:block;padding:2px 4px">-3.54%</b></td>
+									</tr>
+								</tbody>
+<!--Template: Component Map-->  <!--Component map data
+									|strategyid| string
+									|strategycomponentmap| string
+									|components| exploded html fragments from template 'Component'
+								-->
+								<!--Component template (styling name prefix: 'cm')
+								<style>
+									.cmtd {padding:20px 0 10px 4px}
+									.cmb {display:block}
+								</style>
+								<tbody class="strategy-component-map-title">
+									<tr>
+										<td colspan="10" class="cmtd">
+											<b class="cmb">Component Map: |strategyid|</b>|strategycomponentmap|
+										</td>
+									</tr>
+								</tbody>
+								<tbody class="strategy-component-map">
+									|components|
+								</tbody>
+								-->
+								<tbody class="strategy-component-map-title">
+									<tr>
+										<td colspan="10" style="padding:20px 0 10px 4px">
+											<b style="display:block">Component Map: m-SPXo-VIXY</b>m-SPY-S2-S3gcdeabhi-L2-L3bd > m-VIXY-L2abcd-L1-S2a
+										</td>
+									</tr>
+								</tbody>
+								<tbody class="strategy-component-map">
+<!--TEMPLATE: Component-->			<!--Component template data
+										Stage one data (data for building preprocessor template for each component individually)
+											|component| string
+											|type| 'ENTER', 'EXIT', 'ACTIVE', 'IDLE'
+											|d| "0" (days duration)
+											|date| "dd, mmm"
+											|move| "+0.00%;-0.00%"
+											|TPs| "00" total positions solo 
+											|TPc| "00" total positions composite
+											|WLs| "000.00%" win/loss solo
+											|WLc| "000.00%" win/loss composite
+											|APGs| "00.00%" average position gain solo
+											|APGc| "00.00%" average position gain composite
+											|APDs| "00.00" average position duration solo
+											|APDc| "00.00" average position duration composite
+											Data-drive element 'p2': 
+												a. <p class="cpp2-DOWN">			[for |move| < 0]
+												b. <p class="cpp2-UP">				[for |move| > 0]
+											Data-drive element 'p3': 
+												a. <p class="cpp3-DOWN">			[for |move| < 0]
+												b. <p class="cpp3-UP">				[for |move| > 0]
+										Stage two data (data for building full list of component preprocessor templates)
+											|strategyid| string
+											*|map| list of preprocessor templates, from component map of xlookup on |strategyid|
+											*|row| number (row index) from |map|
+											Data-driven element 'tr': 
+												a. <tr class="cptr-ALT"> 			[for odd-numbered row and |type| = 'IDLE']
+												b. <tr class="cptr-ALT-ACTIVE"> 	[for odd-numbered row and |type| = 'ACTIVE' or 'ENTER' or 'EXIT']
+												c. <tr class="cptr-ACTIVE"> 		[for even-numbered row and |type| = 'ACTIVE' or 'ENTER' or 'EXIT']
+												d. <tr> 							[for even-numbered row and |type| = 'IDLE']
+											Data-driven element 'p1': 
+												a. <p class="cpp1"> 				[for |type| = 'IDLE' or 'ACTIVE']
+												b. <p class="cpp1-EXIT">			[for |type| = 'EXIT']
+												c. <p class="cpp1-ENTER">			[for |type| = 'ENTER']
+									-->
+									<!--Component template preprocessing
+										Processing sequence:
+											1. Stage one: Construct preprocessor templates for for each component individually. Elements 'tr' and 'p1' are not calculated at this time.
+											2. Stage two: Combine component preproceesor templates into single list. 'tr' and 'p1' elements are calculated at this time, depending on |map|
+											3. Explode preprocessor list
+											4. Substitute exploded preprocessor list with preprocessor html fragments
+										Collapsed html templates with class and data placeholders
+											type = 'ACTIVE' or 'EXIT': 
+												<tr*><td colspan="2"><p class="cpp1*">|component|</p></td><td colspan="4"><pre class="cppre">|TPs|   |WLs|   |APGs|   |APDs|<br/>|TPc|   |WLc|   |APGc|   |APDc|</pre></td><td colspan="2"><p class="cpp2*">|d| <small>days, |date|</small></p></td><td colspan="2"><p class="cpp3*">|move|</p></td></tr>
+											type = 'ENTER':
+												<tr class="cptr*"><td colspan="2"><p class="cpp1*">|component|</p></td><td colspan="8"></td></tr>
+											type = 'IDLE':
+												<tr class="cptr*"><td colspan="10"><p class="cpp1*">|component|</p></td></tr>									
+										Preprocessor templates
+											type = 'ACTIVE' or 'EXIT':
+												|1x||2||3x||component||4||TPs|   |WLs|   |APGs|   |APDs|<br/>|TPc|   |WLc|   |APGc|   |APDc||5||6x||d||7| |date||8||9x||move||10|
+											type = 'ENTER':
+												|1x||2||3x||component||11|
+											type = 'IDLE':
+												|1x||12||3x||component||13|									
+										Preprocessor html fragments
+											|1a| <tr class="cptr-ALT">
+											|1b| <tr class="cptr-ALT-ACTIVE">
+											|1c| <tr class="cptr-ACTIVE">
+											|1d| <tr>
+											|2|  <td colspan="2">
+											|3a| <p class="cpp1">
+											|3b| <p class="cpp1-EXIT">
+											|3c| <p class="cpp1-ENTER">
+											|4|  </p></td><td colspan="4"><pre class="cppre">
+											|5|  </pre></td><td colspan="2">
+											|6a| <p class="cpp2-DOWN">
+											|6b| <p class="cpp2-UP">
+											|7|  ' <small>days, '
+											|8|  </small></p></td><td colspan="2">
+											|9a| <p class="cpp3*">
+											|9b| <p class="cpp3*">
+											|10| </p></td></tr>
+											|11| </p></td><td colspan="8"></td></tr>
+											|12| <td colspan="10">
+											|13| </p></td></tr>
+									-->
+									<!--Component template (styling name prefix: 'cp')
+									<style>
+										.cptr-ALT {background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0}
+										.cptr-ACTIVE {font-weight:bold}
+										.cptr-ALT-ACTIVE {background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0;font-weight:bold}
+										.cpp1 {margin:4px 8px}
+										.cpp1-EXIT {background-color:#FF9500;border-radius:4px;margin:2px 0;padding:2px 8px}
+										.cpp1-ENTER {background-color:#34C759;border-radius:4px;margin:2px 0;padding:2px 8px}
+										.cppre {font-weight:normal;margin:0;text-align:center}
+										.cpp2-UP {background-color:#409CFF;border-radius:4px 0 0 4px;margin:0;padding:2px 0 2px 8px}
+										.cpp2-DOWN {background-color:#FF6961;border-radius:4px 0 0 4px;margin:0;padding:2px 0 2px 8px}
+										.cpp3-UP {background-color:#409CFF;border-radius:0 4px 4px 0;margin:0;padding:2px 4px;text-align:right}
+										.cpp3-DOWN {background-color:#FF6961;border-radius:0 4px 4px 0;margin:0;padding:2px 4px;text-align:right}
+									</style>
+									// type = 'ACTIVE' or 'EXIT':
+									<tr*>
+										<td colspan="2"><p class="cpp1*">|component|</p></td>
+										<td colspan="4"><pre class="cppre">|TPs|   |WLs|   |APGs|   |APDs|<br/>|TPc|   |WLc|   |APGc|   |APDc|</pre></td>
+										<td colspan="2"><p class="cpp2*">|d| <small>days, |date|</small></p></td>
+										<td colspan="2"><p class="cpp3*">|move|</p></td>
+									</tr>
+									// type = 'IDLE':
+									<tr*>
+										<td colspan="10"><p class="cpp1*">|component|</p></td>
+									</tr>									
+									// type = 'ENTER':
+									<tr*>
+										<td colspan="2"><p class="cpp1*">|component|</p></td>
+										<td colspan="8"></td>
+									</tr>
+									-->
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0">
+										<td colspan="10"><p style="margin:4px 8px">c-SPY-S2</p></td>
+									</tr>
+									<tr style="font-weight:bold">
+										<td colspan="2"><p style="background-color:#FF9500;border-radius:4px;margin:2px 0;padding:2px 8px">c-SPY-S3g</p></td>
+										<td colspan="4"><pre style="font-weight:normal;margin:0;text-align:center">00   000.00%   00.00%   00.00<br/>00   000.00%   00.00%   00.00</pre></td>
+										<td colspan="2"><p style="background-color:#FF6961;border-radius:4px 0 0 4px;margin:0;padding:2px 0 2px 8px">5 <small>days, 17 Jul</small></p></td>
+										<td colspan="2"><p style="background-color:#FF6961;border-radius:0 4px 4px 0;margin:0;padding:2px 4px;text-align:right">-1.77%</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0">
+										<td colspan="10"><p style="margin:4px 8px">c-SPY-S3g</p></td>
+									</tr>
+									<tr>
+										<td colspan="10"><p style="margin:4px 8px">c-SPY-S3c</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0">
+										<td colspan="10"><p style="margin:4px 8px">c-SPY-S3d</p></td>
+									</tr>
+									<tr>
+										<td colspan="10"><p style="margin:4px 8px">c-SPY-S3a</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0;font-weight:bold">
+										<td colspan="2"><p style="margin:4px 8px">c-SPY-S3b</p></td>
+										<td colspan="4"><pre style="font-weight:normal;margin:0;text-align:center">00   000.00%   00.00%   00.00<br/>00   000.00%   00.00%   00.00</pre></td>
+										<td colspan="2"><p style="background-color:#409CFF;border-radius:4px 0 0 4px;margin:0;padding:2px 0 2px 8px">217 <small>days, 23 Jun</small></p></td>
+										<td colspan="2"><p style="background-color:#409CFF;border-radius:0 4px 4px 0;margin:0;padding:2px 4px;text-align:right">+3.41%</p></td>
+									</tr>
+									<tr>
+										<td colspan="10"><p style="margin:4px 8px">c-SPY-S3h</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0;font-weight:bold">
+										<td colspan="2"><p style="background-color:#34C759;border-radius:4px;margin:2px 0;padding:2px 8px">c-SPY-S3i</p></td>
+										<td colspan="8"></td>
+									</tr>
+									<tr>
+										<td colspan="10"><p style="margin:4px 8px">c-SPY-SL2</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0">
+										<td colspan="10"><p style="margin:4px 8px">c-SPY-L3b</p></td>
+									</tr>
+									<tr style="font-weight:bold">
+										<td colspan="2"><p style="margin:4px 8px">c-SPY-L3d</p></td>
+										<td colspan="4"><pre style="font-weight:normal;margin:0;text-align:center">00   000.00%   00.00%   00.00<br/>00   000.00%   00.00%   00.00</pre></td>
+										<td colspan="2"><p style="background-color:#FF6961;border-radius:4px 0 0 4px;margin:0;padding:2px 0 2px 8px;text-align:left">35 <small>days, 2 Jul</small></p></td>
+										<td colspan="2"><p style="background-color:#FF6961;border-radius:0 4px 4px 0;margin:0;padding:2px 4px;text-align:right">-0.83%</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0">
+										<td colspan="10"><p style="margin:4px 8px">c-VIXY-L2a</p></td>
+									</tr>
+									<tr>
+										<td colspan="10"><p style="margin:4px 8px">c-VIXY-L2b</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0;font-weight:bold">
+										<td colspan="2"><p style="margin:4px 8px">c-VIXY-L2c</p></td>
+										<td colspan="4"><pre style="font-weight:normal;margin:0;text-align:center">00   000.00%   00.00%   00.00<br/>00   000.00%   00.00%   00.00</pre></td>
+										<td colspan="2"><p style="background-color:#409CFF;border-radius:4px 0 0 4px;margin:0;padding:2px 0 2px 8px;text-align:left">17 <small>days, 23 Jun</small></p></td>
+										<td colspan="2"><p style="background-color:#409CFF;border-radius:0 4px 4px 0;margin:0;padding:2px 4px;text-align:right">+3.41%</p></td>
+									</tr>
+									<tr>
+										<td colspan="10"><p style="margin:4px 8px">c-VIXY-L2d</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0">
+										<td colspan="10"><p style="margin:4px 8px">c-VIXY-L2e</p></td>
+									</tr>
+									<tr>
+										<td colspan="10"><p style="margin:4px 8px">c-VIXY-L1</p></td>
+									</tr>
+									<tr style="background-color:#FFFFFF;border-color:#AEAEB2;border-style:solid;border-width:1px 0">
+										<td colspan="10"><p style="margin:4px 8px">c-VIXY-S2a</p></td>
+									</tr>
+								</tbody>
+								<tfoot class="strategy-footer">
+									<tr>
+										<td colspan="10" style="color:#8E8E93;font-size:smaller;padding:8px 0 0 0;text-align:right;"><a href="#" style="color:#8E8E93;">Execution guide</a> | <a href="#" style="color:#8E8E93;">Fact sheet</a></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+
+					</div>
+					<!--[if mso]>
+					</td>
+					</tr>
+					</table>
+					<![endif]-->
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
